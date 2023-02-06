@@ -2,6 +2,8 @@ package com.common.config;
 
 public class SystemConfig {
 
+    public static final String INTF_URL="http://127.0.0.1:8080";
+
     /**
      * 接口调用凭证请求地址
      */
