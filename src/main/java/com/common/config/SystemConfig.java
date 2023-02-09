@@ -18,4 +18,14 @@ public class SystemConfig {
      * 获取采购订单
      */
     public static final String GET_ORDER="ZJ9609";
+
+    /**
+     * 获取生产企业
+     */
+    public static final String GET_COMPANY="ZJ9618";
+
+    /**
+     * 获取医疗机构
+     */
+    public static final String GET_HOSPITAL="ZJ9619";
 }
