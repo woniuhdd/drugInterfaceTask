@@ -2,8 +2,10 @@ package com.common.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.common.config.SystemConfig;
+import com.common.entity.IntfRequestBody;
 import com.common.entity.IntfResponseBody;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.Charsets;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -40,7 +42,11 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
         if(token==null){
             getToken();
         }
-        request.getHeaders().add("Access-Token",token);
+//        request.getHeaders().add("Access-Token",token);
+        //token改为放在交易输入请求体中
+        IntfRequestBody requestBody = JSONObject.parseObject(new String(body, Charsets.UTF_8), IntfRequestBody.class);
+        requestBody.getInput().put("accessToken",token);
+
         ClientHttpResponse response = execution.execute(request, body);
         int rawStatusCode = response.getRawStatusCode();
         if(rawStatusCode!=200){

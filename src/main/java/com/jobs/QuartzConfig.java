@@ -38,16 +38,16 @@ public class QuartzConfig implements ApplicationContextAware {
         Map<String,Object> params=new HashMap<>();
         params.put("isusing","1");
         List<SysTasks> tasks = tasksManager.getListByParams(params);
-        for (SysTasks task : tasks) {
-            ScheduleJob job=new ScheduleJob();
-            job.setJobGroup("synTasks"); // 任务组
-            job.setJobName(task.getTaskName());// 任务名称
-            job.setJobStatus("1"); // 任务发布状态
-            job.setIsConcurrent("1"); // 运行状态
-            job.setCronExpression(task.getTaskCron());
-            job.setBeanClass(task.getTaskClass());// 一个以所给名字注册的bean的实例
-            addOrUpdateJob(job);
-        }
+//        for (SysTasks task : tasks) {
+//            ScheduleJob job=new ScheduleJob();
+//            job.setJobGroup("synTasks"); // 任务组
+//            job.setJobName(task.getTaskName());// 任务名称
+//            job.setJobStatus("1"); // 任务发布状态
+//            job.setIsConcurrent("1"); // 运行状态
+//            job.setCronExpression(task.getTaskCron());
+//            job.setBeanClass(task.getTaskClass());// 一个以所给名字注册的bean的实例
+//            addOrUpdateJob(job);
+//        }
 
     }
 

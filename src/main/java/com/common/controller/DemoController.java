@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -36,7 +35,7 @@ public class DemoController {
         JSONObject input=new JSONObject();
         JSONObject data=new JSONObject();
         input.put("data",data);
-        requestBody.setInput(input.toJSONString());
+        requestBody.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");

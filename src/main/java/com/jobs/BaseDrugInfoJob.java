@@ -42,19 +42,19 @@ public class BaseDrugInfoJob implements BaseJob {
 
     public void  syncDatas(int page) throws Exception{
         IntfRequestBody requestBody = new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_ORDER);
+        requestBody.setInfno(SystemConfig.GET_DRUG);
 
         JSONObject input = new JSONObject();
         JSONObject data = new JSONObject();
         data.put("current",page);
         data.put("size",100);
         input.put("data",data);
-        requestBody.setInput(input.toJSONString());
+        requestBody.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
         HttpEntity<String> reqBody = new HttpEntity<>(JSONObject.toJSONString(requestBody),headers);
-        ResponseEntity<IntfResponseBody> responseEntity = tokenRestTemplate.exchange(SystemConfig.INTF_URL + SystemConfig.COMMON_INTERFACES_URL, HttpMethod.POST, reqBody, IntfResponseBody.class);
+        ResponseEntity<IntfResponseBody> responseEntity = tokenRestTemplate.exchange(SystemConfig.url + SystemConfig.COMMON_INTERFACES_URL, HttpMethod.POST, reqBody, IntfResponseBody.class);
         log.info("请求结果==={}",responseEntity);
 
         //1.解析结果

@@ -6,8 +6,9 @@ import com.common.config.SystemConfig;
 import com.common.config.TokenRestTemplate;
 import com.common.entity.IntfRequestBody;
 import com.common.entity.IntfResponseBody;
-import com.trade.model.BaseCompanyInfo;
-import com.trade.service.BaseCompanyInfoManager;
+import com.common.utils.DateUtil;
+import com.trade.model.MiddlePurchaseOrder;
+import com.trade.service.MiddlePurchaseOrderService;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,16 +17,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-public class BaseCompanyInfoJob implements BaseJob {
-    private static final Logger log = LoggerFactory.getLogger(BaseCompanyInfoJob.class);
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+public class MiddlePurchaseOrderJob implements BaseJob {
+    private static final Logger log = LoggerFactory.getLogger(MiddlePurchaseOrderJob.class);
 
-    private BaseCompanyInfoManager baseCompanyInfoManager = QuartzConfig.getBean(BaseCompanyInfoManager.class);
+    private MiddlePurchaseOrderService orderService = QuartzConfig.getBean(MiddlePurchaseOrderService.class);
     private TokenRestTemplate tokenRestTemplate=QuartzConfig.getBean(TokenRestTemplate.class);
     @Override
     public void execute(JobExecutionContext context) {
@@ -34,19 +31,20 @@ public class BaseCompanyInfoJob implements BaseJob {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("获取企业信息任务执行的时间：" + dateFormat.format(new Date()));
+        log.info("获取采购订单信息任务执行的时间：" + DateUtil.dateTimeFormat(new Date()));
     }
 
     public void  syncDatas( int page){
-        log.info("生产企业接口查询");
+        log.info("采购订单接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_COMPANY);
+        requestBody.setInfno(SystemConfig.GET_ORDER);
 
         JSONObject input=new JSONObject();
-        JSONObject data=new JSONObject();
-        data.put("current",page);
-        data.put("size",100);
-        input.put("data",data);
+        Date now=new Date();
+        input.put("currentPageNumber", String.valueOf(page));
+        //订单发送日期
+        input.put("startTime", DateUtil.dateFormat(now));
+        input.put("endTime", DateUtil.dateFormat(now));
         requestBody.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
@@ -58,22 +56,18 @@ public class BaseCompanyInfoJob implements BaseJob {
             //1.解析结果
             IntfResponseBody body =responseEntity.getBody();
             if(body.getInfcode()==0){
-                if(page==1){
-                    baseCompanyInfoManager.deleteAllDatas();
-                }
                 JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
-                List<BaseCompanyInfo> companys = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
-                baseCompanyInfoManager.saveBatch(companys);
+                List<MiddlePurchaseOrder>  orderList= JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
+                orderService.saveOrUpdateBatch(orderList);
                 if(page<outputData.getInteger("totalPageCount")){
                     syncDatas( ++page);
                 }
             }else {
-                log.info("调用生产企业接口失败======"+body.getErr_msg());
+                log.info("调用采购订单接口失败======"+body.getErr_msg());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("调用生产企业接口异常");
+            log.info("调用采购订单接口异常");
         }
     }
-
 }

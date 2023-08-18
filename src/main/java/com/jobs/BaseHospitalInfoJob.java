@@ -49,13 +49,13 @@ public class BaseHospitalInfoJob implements BaseJob {
         data.put("current",page);
         data.put("size",100);
         input.put("data",data);
-        requestBody.setInput(input.toJSONString());
+        requestBody.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
         HttpEntity<String> reqBody=new HttpEntity<>(JSONObject.toJSONString(requestBody),headers);
         try {
-            ResponseEntity<IntfResponseBody> responseEntity = tokenRestTemplate.exchange(SystemConfig.INTF_URL + SystemConfig.COMMON_INTERFACES_URL,
+            ResponseEntity<IntfResponseBody> responseEntity = tokenRestTemplate.exchange(SystemConfig.url + SystemConfig.COMMON_INTERFACES_URL,
                     HttpMethod.POST, reqBody, IntfResponseBody.class);
             //1.解析结果
             IntfResponseBody body =responseEntity.getBody();

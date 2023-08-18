@@ -1,5 +1,6 @@
 package com.common.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 
@@ -17,5 +18,5 @@ public class IntfRequestBody {
     /**
      * 交易输入
      */
-    private String input;
+    private JSONObject input;
 }

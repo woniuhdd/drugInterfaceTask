@@ -1,8 +1,13 @@
 package com.common.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = "intf")
 public class SystemConfig {
 
-    public static final String INTF_URL="http://127.0.0.1:8080";
+    public static String url;
 
     /**
      * 接口调用凭证请求地址
@@ -12,20 +17,36 @@ public class SystemConfig {
     /**
      * 请求地址
      */
-    public static final String COMMON_INTERFACES_URL="/tps-local-bd/intf/api/commonInterfaces";
+    public static final String COMMON_INTERFACES_URL="/tps-local-bd/web/interface/commonInterface";
 
     /**
-     * 获取采购订单
+     * 获取药品
      */
-    public static final String GET_ORDER="ZJ9609";
+    public static final String GET_DRUG="C1001";
 
     /**
      * 获取生产企业
      */
-    public static final String GET_COMPANY="ZJ9618";
+    public static final String GET_COMPANY="C1002";
 
     /**
      * 获取医疗机构
      */
-    public static final String GET_HOSPITAL="ZJ9619";
+    public static final String GET_HOSPITAL="C1003";
+
+    /**
+     * 获取采购订单
+     */
+    public static final String GET_ORDER="C1004";
+
+    /**
+     * 维护发票信息
+     */
+    public static final String SEND_INVOICE_INFO="C1006";
+
+    /**
+     * 发票附件上传
+     */
+    public static final String SEND_INVOICE_IMG="C1007";
+
 }
