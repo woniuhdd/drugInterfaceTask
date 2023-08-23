@@ -64,4 +64,9 @@ public class SystemConfig {
      */
     public static final String GET_ORDER_RETN="C1010";
 
+    /**
+     * 药品退货订单响应
+     */
+    public static final String SEND_ORDER_RETN="C1011";
+
 }
