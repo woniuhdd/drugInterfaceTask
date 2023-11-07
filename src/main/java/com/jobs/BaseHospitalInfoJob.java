@@ -19,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseHospitalInfoJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(BaseHospitalInfoJob.class);
@@ -42,14 +44,15 @@ public class BaseHospitalInfoJob implements BaseJob {
     public void  syncDatas( int page){
         log.info("医疗机构接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_HOSPITAL);
-
-        JSONObject input=new JSONObject();
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
         JSONObject data=new JSONObject();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_HOSPITAL);
         data.put("current",page);
         data.put("size",100);
         input.put("data",data);
-        requestBody.setInput(input);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -63,7 +66,7 @@ public class BaseHospitalInfoJob implements BaseJob {
                 if(page==1){
                     baseHospitalInfoManager.deleteAllDatas();
                 }
-                JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
                 List<BaseHospitalInfo>  hospitalInfos= JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                 baseHospitalInfoManager.saveBatch(hospitalInfos);
                 if(page<outputData.getInteger("totalPageCount")){

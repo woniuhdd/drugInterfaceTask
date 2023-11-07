@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class BaseDrugInfoJob implements BaseJob {
@@ -41,15 +43,16 @@ public class BaseDrugInfoJob implements BaseJob {
     }
 
     public void  syncDatas(int page) throws Exception{
-        IntfRequestBody requestBody = new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_DRUG);
-
-        JSONObject input = new JSONObject();
+        IntfRequestBody requestBody=new IntfRequestBody();
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_DRUG);
         JSONObject data = new JSONObject();
         data.put("current",page);
         data.put("size",100);
         input.put("data",data);
-        requestBody.setInput(input);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -58,7 +61,7 @@ public class BaseDrugInfoJob implements BaseJob {
         log.info("请求结果==={}",responseEntity);
 
         //1.解析结果
-        JSONObject resultData = JSONObject.parseObject(responseEntity.getBody().getOutput());
+        JSONObject resultData = responseEntity.getBody().getOutput();
         if(resultData.getInteger("returnCode")==0){
             if(page==1){
                 baseDrugInfoManager.deleteAllDatas();

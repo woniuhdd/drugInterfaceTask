@@ -19,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseCompanyInfoJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(BaseCompanyInfoJob.class);
@@ -40,14 +42,15 @@ public class BaseCompanyInfoJob implements BaseJob {
     public void  syncDatas( int page){
         log.info("生产企业接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_COMPANY);
-
-        JSONObject input=new JSONObject();
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_COMPANY);
         JSONObject data=new JSONObject();
         data.put("current",page);
         data.put("size",100);
         input.put("data",data);
-        requestBody.setInput(input);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -61,7 +64,7 @@ public class BaseCompanyInfoJob implements BaseJob {
                 if(page==1){
                     baseCompanyInfoManager.deleteAllDatas();
                 }
-                JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
                 List<BaseCompanyInfo> companys = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
                 baseCompanyInfoManager.saveBatch(companys);
                 if(page<outputData.getInteger("totalPageCount")){

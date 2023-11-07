@@ -10,10 +10,13 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,9 +48,9 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
 //        request.getHeaders().add("Access-Token",token);
         //token改为放在交易输入请求体中
         IntfRequestBody requestBody = JSONObject.parseObject(new String(body, Charsets.UTF_8), IntfRequestBody.class);
-        requestBody.getInput().put("accessToken",token);
+        requestBody.getInfo().getInput().get("data").put("accessToken",token);
 
-        ClientHttpResponse response = execution.execute(request, body);
+        ClientHttpResponse response = execution.execute(request, JSONObject.toJSONString(requestBody).getBytes(StandardCharsets.UTF_8));
         int rawStatusCode = response.getRawStatusCode();
         if(rawStatusCode!=200){
             log.info("请求接口异常======>{}：{}",rawStatusCode,response.getStatusText());
@@ -56,12 +59,13 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
     }
 
     public void getToken(){
-        Map<String,String> params=new HashMap<>();
-        params.put("appCode",appCode);
-        params.put("authCode",authCode);
+
         HttpHeaders headers=new HttpHeaders();
-        headers.add("content-type","application/x-www-form-urlencoded");
-        HttpEntity<String> reqBody=new HttpEntity<>(JSONObject.toJSONString(params),headers);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String,String> params=new LinkedMultiValueMap<>();
+        params.add("appCode",appCode);
+        params.add("authCode",authCode);
+        HttpEntity<MultiValueMap<String,String>> reqBody=new HttpEntity<>(params,headers);
 
         ResponseEntity<IntfResponseBody> responseEntity = null;
         try {
@@ -70,8 +74,8 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
             HttpStatus statusCode = responseEntity.getStatusCode();
             if(statusCode.value()==200){
                 IntfResponseBody body = responseEntity.getBody();
-                if(body.getInfcode()==0){
-                    JSONObject data = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                if(body.getInfcode()==0||"令牌有效期超过5分钟，不能再次获取令牌".equals(body.getErr_msg())){
+                    JSONObject data = body.getOutput().getJSONObject("data");
                     token=data.getString("accessToken");
                 }else{
                     log.info("获取token异常：{}",body.getErr_msg());

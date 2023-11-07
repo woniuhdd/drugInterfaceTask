@@ -1,18 +1,13 @@
 package com.common.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
-@ConfigurationProperties(prefix = "intf")
 public class SystemConfig {
 
-    public static String url;
+    public static final String url="http://60.31.22.187:9100";
 
     /**
      * 接口调用凭证请求地址
      */
-    public static final String TOKEN_URL="/tps-local-bd/intf/api/accessToken/getAccessEntpToken";
+    public static final String TOKEN_URL="/tps-local-bd/web/interface/accessToken/getAccessToken";
 
     /**
      * 请求地址

@@ -54,6 +54,6 @@ logging:
 
 
 intf:
-  appCode: abc #接口调用凭证应用码
-  authCode: 123 #接口调用凭证授权码
-  url: http://127.0.0.1:8080 #接口请求地址
+  appCode: b016ddaa78a24103867e327023386fc1 #接口调用凭证应用码
+  authCode: 5750aa105c624a9599c4592f49049f60 #接口调用凭证授权码
+  url: http://60.31.22.187:9100 #接口请求地址

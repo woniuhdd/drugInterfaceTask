@@ -21,9 +21,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MiddleInvoiceImgJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(MiddleInvoiceImgJob.class);
@@ -43,7 +41,10 @@ public class MiddleInvoiceImgJob implements BaseJob {
     public void  syncDatas(){
         log.info("发票附件上传接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.SEND_INVOICE_IMG);
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.SEND_INVOICE_IMG);
         //查询未交互的发票图片
         LambdaQueryWrapper<MiddleInvoiceImg> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceImg>().
                 eq(MiddleInvoiceImg::getResponseState,"0");
@@ -51,13 +52,18 @@ public class MiddleInvoiceImgJob implements BaseJob {
         invoiceImgs.forEach(invoiceImg->{
             JSONObject object = getFileBase64Str(invoiceImg);
             if(object.getString("code").equals("0")){
+                invoiceImg.setResponseState("3");
+                invoiceImg.setResponseInfo(object.getString("msg"));
+                invoiceImg.setResponseTime(new Date());
+                invoiceImgService.updateById(invoiceImg);
                 return;
             }
-            JSONObject input=new JSONObject();
-            input.put("invoId",invoiceImg.getInvoId());
-            input.put("fileBase64Str",object.getString("fileBase64Str"));
-            input.put("fileName",invoiceImg.getFileName());
-            requestBody.setInput(input);
+            JSONObject data=new JSONObject();
+            data.put("invoId",invoiceImg.getInvoId());
+            data.put("fileBase64Str",object.getString("fileBase64Str"));
+            data.put("fileName",invoiceImg.getFileName());
+            input.put("data",data);
+            info.setInput(input);
 
             HttpHeaders headers=new HttpHeaders();
             headers.add("content-type","application/json;charset=utf-8");
@@ -68,7 +74,7 @@ public class MiddleInvoiceImgJob implements BaseJob {
                 //1.解析结果
                 IntfResponseBody body =responseEntity.getBody();
                 if(body.getInfcode()==0){
-                    JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                    JSONObject outputData = body.getOutput().getJSONObject("data");
                     invoiceImg.setFileId(outputData.getString("fileId"));
                     if("0".equals(outputData.getString("returnCode"))){
                         invoiceImg.setResponseState("2");

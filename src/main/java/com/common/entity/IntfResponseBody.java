@@ -1,5 +1,6 @@
 package com.common.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 
 /**
@@ -35,5 +36,5 @@ public class IntfResponseBody {
     /**
      *  交易输出
      */
-    private String output;
+    private JSONObject output;
 }

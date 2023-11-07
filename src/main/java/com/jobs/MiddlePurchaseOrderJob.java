@@ -37,15 +37,18 @@ public class MiddlePurchaseOrderJob implements BaseJob {
     public void  syncDatas( int page){
         log.info("采购订单接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_ORDER);
-
-        JSONObject input=new JSONObject();
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        JSONObject data=new JSONObject();
+        Map<String,JSONObject> input=new HashMap<>();
         Date now=new Date();
-        input.put("currentPageNumber", String.valueOf(page));
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_ORDER);
+        data.put("currentPageNumber", String.valueOf(page));
         //订单发送日期
-        input.put("startTime", DateUtil.dateFormat(now));
-        input.put("endTime", DateUtil.dateFormat(now));
-        requestBody.setInput(input);
+        data.put("startTime", DateUtil.dateFormat(now));
+        data.put("endTime", DateUtil.dateFormat(now));
+        input.put("data",data);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -56,7 +59,7 @@ public class MiddlePurchaseOrderJob implements BaseJob {
             //1.解析结果
             IntfResponseBody body =responseEntity.getBody();
             if(body.getInfcode()==0){
-                JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
                 List<MiddlePurchaseOrder>  orderList= JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                 orderService.saveOrUpdateBatch(orderList);
                 if(page<outputData.getInteger("totalPageCount")){
