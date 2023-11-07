@@ -20,7 +20,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MiddleOrderRetnJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(MiddleOrderRetnJob.class);
@@ -40,15 +42,19 @@ public class MiddleOrderRetnJob implements BaseJob {
     public void  syncDatas(int page){
         log.info("退货订单接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_ORDER_RETN);
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_ORDER_RETN);
 
-        JSONObject input=new JSONObject();
+        JSONObject data=new JSONObject();
         Date now=new Date();
-        input.put("currentPageNumber", String.valueOf(page));
+        data.put("currentPageNumber", String.valueOf(page));
         //订单发送日期
-        input.put("strUpTime", DateUtil.dateFormat(now));
-        input.put("endUpTime", DateUtil.dateFormat(now));
-        requestBody.setInput(input);
+        data.put("strUpTime", DateUtil.dateFormat(now));
+        data.put("endUpTime", DateUtil.dateFormat(now));
+        input.put("data",data);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -59,7 +65,7 @@ public class MiddleOrderRetnJob implements BaseJob {
             //1.解析结果
             IntfResponseBody body = responseEntity.getBody();
             if(body.getInfcode()==0){
-                JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
                 List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
                 middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
                 if(page<outputData.getInteger("totalPageCount")){

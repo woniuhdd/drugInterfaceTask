@@ -15,7 +15,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +58,43 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
         if(rawStatusCode!=200){
             log.info("请求接口异常======>{}：{}",rawStatusCode,response.getStatusText());
         }
+//        String responseBody = getBody(response);
+//        IntfResponseBody intfResponseBody = JSONObject.parseObject(responseBody, IntfResponseBody.class);
+
         return response;
+    }
+
+    private String getBody(ClientHttpResponse response){
+        InputStream inputStream = null ;
+        BufferedReader bufferedReader = null ;
+        StringBuilder stringBuilder=new StringBuilder();
+        try {
+            inputStream=response.getBody();
+            bufferedReader=new BufferedReader(new InputStreamReader(inputStream));
+            char[] chars=new char[128];
+            int bytesRead=-1;
+            while((bytesRead=bufferedReader.read(chars))>0){
+                stringBuilder.append(chars,0,bytesRead);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(inputStream!=null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(bufferedReader!=null){
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public void getToken(){

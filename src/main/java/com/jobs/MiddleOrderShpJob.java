@@ -20,7 +20,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MiddleOrderShpJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(MiddleOrderShpJob.class);
@@ -40,11 +42,15 @@ public class MiddleOrderShpJob implements BaseJob {
     public void  syncDatas(int page){
         log.info("采购收货信息接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.GET_ORDER_SHP);
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.GET_ORDER_SHP);
 
-        JSONObject input=new JSONObject();
-        input.put("currentPageNumber", String.valueOf(page));
-        requestBody.setInput(input);
+        JSONObject data=new JSONObject();
+        data.put("currentPageNumber", String.valueOf(page));
+        input.put("data",data);
+        info.setInput(input);
 
         HttpHeaders headers=new HttpHeaders();
         headers.add("content-type","application/json;charset=utf-8");
@@ -55,7 +61,7 @@ public class MiddleOrderShpJob implements BaseJob {
             //1.解析结果
             IntfResponseBody body =responseEntity.getBody();
             if(body.getInfcode()==0){
-                JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
                 List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
                 middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
                 if(page<outputData.getInteger("totalPageCount")){

@@ -37,21 +37,25 @@ public class MiddleOrderRetnResponseJob implements BaseJob {
     public void  syncDatas(){
         log.info("药品退货订单响应接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.SEND_ORDER_RETN);
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.SEND_ORDER_RETN);
         //查询未交互的信息
         LambdaQueryWrapper<MiddleOrderRetnResponse> queryWrapper=new LambdaQueryWrapper<MiddleOrderRetnResponse>().
                 eq(MiddleOrderRetnResponse::getResponseState,"0");
         List<MiddleOrderRetnResponse> middleOrderRetnResponseList = middleOrderRetnResponseService.list(queryWrapper);
         middleOrderRetnResponseList.forEach(middleOrderRetnResponse->{
-            JSONObject input=new JSONObject();
+            JSONObject data=new JSONObject();
             List<Map<String,Object>> dataList = new ArrayList<>();
             Map<String,Object> map = new HashMap<>();
             map.put("retnId",middleOrderRetnResponse.getRetnId());
             map.put("retnChkStas",middleOrderRetnResponse.getRetnChkStas());
             map.put("delventpFailRea",middleOrderRetnResponse.getDelventpFailRea());
             dataList.add(map);
-            input.put("dataList",dataList);
-            requestBody.setInput(input);
+            data.put("dataList",dataList);
+            input.put("data",data);
+            info.setInput(input);
 
             HttpHeaders headers=new HttpHeaders();
             headers.add("content-type","application/json;charset=utf-8");
@@ -62,7 +66,7 @@ public class MiddleOrderRetnResponseJob implements BaseJob {
                 //1.解析结果
                 IntfResponseBody body =responseEntity.getBody();
                 if(body.getInfcode()==0){
-                    JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                    JSONObject outputData = body.getOutput().getJSONObject("data");
                     if("0".equals(outputData.getString("returnCode"))){
                         middleOrderRetnResponse.setResponseState("2");
                     }else{

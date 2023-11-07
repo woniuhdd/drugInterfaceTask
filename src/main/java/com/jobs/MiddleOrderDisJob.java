@@ -37,13 +37,16 @@ public class MiddleOrderDisJob implements BaseJob {
     public void  syncDatas(){
         log.info("药品发货信息上传接口查询");
         IntfRequestBody requestBody=new IntfRequestBody();
-        requestBody.setInfno(SystemConfig.SEND_ORDER_DIS);
+        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
+        Map<String,JSONObject> input=new HashMap<>();
+        requestBody.setInfo(info);
+        info.setInfno(SystemConfig.SEND_ORDER_DIS);
         //查询未交互的配送信息
         LambdaQueryWrapper<MiddleOrderDis> queryWrapper=new LambdaQueryWrapper<MiddleOrderDis>().
                 eq(MiddleOrderDis::getResponseState,"0");
         List<MiddleOrderDis> orderDisList = orderDisService.list(queryWrapper);
         orderDisList.forEach(orderDis->{
-            JSONObject input=new JSONObject();
+            JSONObject data=new JSONObject();
             List<Map<String,Object>> dataList = new ArrayList<>();
             Map<String,Object> map = new HashMap<>();
             map.put("shpId",orderDis.getShpId());
@@ -52,8 +55,9 @@ public class MiddleOrderDisJob implements BaseJob {
             map.put("expyEndtime",orderDis.getExpyEndtime());
             map.put("shpMemo",orderDis.getShpMemo());
             dataList.add(map);
-            input.put("dataList",dataList);
-            requestBody.setInput(input);
+            data.put("dataList",dataList);
+            input.put("data",data);
+            info.setInput(input);
 
             HttpHeaders headers=new HttpHeaders();
             headers.add("content-type","application/json;charset=utf-8");
@@ -64,7 +68,7 @@ public class MiddleOrderDisJob implements BaseJob {
                 //1.解析结果
                 IntfResponseBody body =responseEntity.getBody();
                 if(body.getInfcode()==0){
-                    JSONObject outputData = JSONObject.parseObject(body.getOutput()).getJSONObject("data");
+                    JSONObject outputData = body.getOutput().getJSONObject("data");
                     if("0".equals(outputData.getString("returnCode"))){
                         orderDis.setResponseState("2");
                     }else{
