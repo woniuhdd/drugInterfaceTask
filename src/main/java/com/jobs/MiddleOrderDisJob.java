@@ -3,19 +3,14 @@ package com.jobs;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.common.config.SystemConfig;
-import com.common.config.TokenRestTemplate;
-import com.common.entity.IntfRequestBody;
 import com.common.entity.IntfResponseBody;
+import com.common.service.MiddleRequestService;
 import com.common.utils.DateUtil;
 import com.trade.model.MiddleOrderDis;
 import com.trade.service.MiddleOrderDisService;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
@@ -23,7 +18,8 @@ public class MiddleOrderDisJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(MiddleOrderDisJob.class);
 
     private MiddleOrderDisService orderDisService = QuartzConfig.getBean(MiddleOrderDisService.class);
-    private TokenRestTemplate tokenRestTemplate=QuartzConfig.getBean(TokenRestTemplate.class);
+    private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
+
     @Override
     public void execute(JobExecutionContext context) {
         try {
@@ -36,11 +32,7 @@ public class MiddleOrderDisJob implements BaseJob {
 
     public void  syncDatas(){
         log.info("药品发货信息上传接口查询");
-        IntfRequestBody requestBody=new IntfRequestBody();
-        IntfRequestBody.RequestInfo info = new IntfRequestBody.RequestInfo();
-        Map<String,JSONObject> input=new HashMap<>();
-        requestBody.setInfo(info);
-        info.setInfno(SystemConfig.SEND_ORDER_DIS);
+
         //查询未交互的配送信息
         LambdaQueryWrapper<MiddleOrderDis> queryWrapper=new LambdaQueryWrapper<MiddleOrderDis>().
                 eq(MiddleOrderDis::getResponseState,"0");
@@ -56,17 +48,11 @@ public class MiddleOrderDisJob implements BaseJob {
             map.put("shpMemo",orderDis.getShpMemo());
             dataList.add(map);
             data.put("dataList",dataList);
-            input.put("data",data);
-            info.setInput(input);
+            String requestBody = requestService.getRequestBody(SystemConfig.SEND_ORDER_DIS, data);
 
-            HttpHeaders headers=new HttpHeaders();
-            headers.add("content-type","application/json;charset=utf-8");
-            HttpEntity<String> reqBody=new HttpEntity<>(JSONObject.toJSONString(requestBody),headers);
             try {
-                ResponseEntity<IntfResponseBody> responseEntity = tokenRestTemplate.exchange(SystemConfig.url + SystemConfig.COMMON_INTERFACES_URL,
-                        HttpMethod.POST, reqBody, IntfResponseBody.class);
                 //1.解析结果
-                IntfResponseBody body =responseEntity.getBody();
+                IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
                     if("0".equals(outputData.getString("returnCode"))){

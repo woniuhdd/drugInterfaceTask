@@ -10,9 +10,15 @@ public class SystemConfig {
     public static final String TOKEN_URL="/tps-local-bd/web/interface/accessToken/getAccessToken";
 
     /**
-     * 请求地址
+     * 通用请求地址
      */
     public static final String COMMON_INTERFACES_URL="/tps-local-bd/web/interface/commonInterface";
+
+
+    /**
+     *    药品发票附件上传
+     */
+    public static final String UPLOAD_DRUGINVO_FILE="/interface/delv/uploadDrugInvoFile";
 
     /**
      * 获取药品

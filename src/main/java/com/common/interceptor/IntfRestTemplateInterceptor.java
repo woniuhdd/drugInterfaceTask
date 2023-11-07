@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor {
@@ -58,9 +56,6 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
         if(rawStatusCode!=200){
             log.info("请求接口异常======>{}：{}",rawStatusCode,response.getStatusText());
         }
-//        String responseBody = getBody(response);
-//        IntfResponseBody intfResponseBody = JSONObject.parseObject(responseBody, IntfResponseBody.class);
-
         return response;
     }
 
@@ -78,21 +73,6 @@ public class IntfRestTemplateInterceptor implements ClientHttpRequestInterceptor
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(inputStream!=null){
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(bufferedReader!=null){
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return stringBuilder.toString();
     }

@@ -18,7 +18,7 @@ public class IntfRestTemplateAutoConfiguration {
     @Resource
     private IntfRestTemplateInterceptor intfRestTemplateInterceptor;
 
-    @Bean
+    @Bean(name = {"tokenRestTemplate"})
     public TokenRestTemplate tokenRestTemplate(){
         List<ClientHttpRequestInterceptor> interceptors = this.tokenRestTemplate.getInterceptors();
         if(CollectionUtils.isEmpty(interceptors)){
