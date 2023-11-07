@@ -6,7 +6,7 @@ import com.common.config.SystemConfig;
 import com.common.entity.IntfResponseBody;
 import com.common.service.MiddleRequestService;
 import com.trade.model.BaseDrugInfo;
-import com.trade.service.BaseDrugInfoManager;
+import com.trade.service.BaseDrugInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -20,7 +20,7 @@ public class BaseDrugInfoJob implements BaseJob {
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private BaseDrugInfoManager baseDrugInfoManager = QuartzConfig.getBean(BaseDrugInfoManager.class);
+    private BaseDrugInfoService baseDrugInfoService = QuartzConfig.getBean(BaseDrugInfoService.class);
 
     private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
 
@@ -47,11 +47,8 @@ public class BaseDrugInfoJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
             JSONObject resultData = body.getOutput().getJSONObject("data");
             if (resultData.getInteger("returnCode") == 0) {
-                if (page == 1) {
-                    baseDrugInfoManager.deleteAllDatas();
-                }
                 List<BaseDrugInfo> druginfos = JSONArray.parseArray(resultData.getString("dataList"), BaseDrugInfo.class);
-                baseDrugInfoManager.saveBatch(druginfos);
+                baseDrugInfoService.saveOrUpdateBatch(druginfos);
                 if (page < resultData.getInteger("totalPageCount")) {
                     syncDatas(++page);
                 }
