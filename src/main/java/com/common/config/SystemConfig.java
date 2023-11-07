@@ -44,4 +44,24 @@ public class SystemConfig {
      */
     public static final String SEND_INVOICE_IMG="C1007";
 
+    /**
+     * 药品发货信息上传
+     */
+    public static final String SEND_ORDER_DIS="C1008";
+
+    /**
+     * 药品获取收货信息
+     */
+    public static final String GET_ORDER_SHP="C1009";
+
+    /**
+     * 药品获取退货订单
+     */
+    public static final String GET_ORDER_RETN="C1010";
+
+    /**
+     * 药品退货订单响应
+     */
+    public static final String SEND_ORDER_RETN="C1011";
+
 }
