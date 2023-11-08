@@ -1,5 +1,7 @@
 package com.trade.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,7 @@ public class MiddlePurchaseOrder {
 
     private String 	ordId	;//	订单 ID
     private String 	ordCode	;//	订单 CODE
+    @TableId(value = "ORD_DETL_ID", type = IdType.ID_WORKER_STR)
     private String 	ordDetlId	;//	订单明细 ID
     private String 	shpId	;//	发货 ID
     private Double	pubonlnPric	;//	挂网价格

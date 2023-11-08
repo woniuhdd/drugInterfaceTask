@@ -36,7 +36,10 @@ public class MiddlePurchaseOrderJob implements BaseJob {
         Date now=new Date();
         data.put("currentPageNumber", String.valueOf(page));
         //订单发送日期
-        data.put("startTime", DateUtil.dateFormat(now));
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        data.put("startTime", DateUtil.dateFormat(cal.getTime()));
         data.put("endTime", DateUtil.dateFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
         try {
@@ -44,10 +47,16 @@ public class MiddlePurchaseOrderJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                List<MiddlePurchaseOrder>  orderList= JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
-                orderService.saveOrUpdateBatch(orderList);
-                if(page<outputData.getInteger("totalPageCount")){
-                    syncDatas( ++page);
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddlePurchaseOrder> orderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
+                    if (orderList.size() > 0){
+                        orderService.saveOrUpdateBatch(orderList);
+                        if(page<outputData.getInteger("totalPageCount")){
+                            syncDatas(++page);
+                        }
+                    }
+                }else {
+                    log.info("调用采购订单接口失败======"+body.getErr_msg());
                 }
             }else {
                 log.info("调用采购订单接口失败======"+body.getErr_msg());
