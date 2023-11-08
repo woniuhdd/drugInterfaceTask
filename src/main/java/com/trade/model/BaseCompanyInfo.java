@@ -1,44 +1,62 @@
 package com.trade.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 生产企业信息
+ * <p>
+ * 企业信息
+ * </p>
+ *
+ * @author hdd
+ * @since 2023-11-08
  */
 @Data
-public class BaseCompanyInfo {
-    /**
-     *统一社会信用代码
-     */
-    private String uscc;
-    /**
-     *企业代码
-     */
-    private String entpCode;
-    /**
-     *生产企业
-     */
-    private String orgName;
-    /**
-     *联系人
-     */
-    private String coner;
-    /**
-     *联系电话
-     */
-    private String conerMod;
-    /**
-     *组织信息ID
-     */
+@TableName("BASE_COMPANY_INFO")
+public class BaseCompanyInfo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    //(value = "组织信息 ID")
+    @TableId(value = "ORG_INFO_ID", type = IdType.ID_WORKER_STR)
     private String orgInfoId;
-    /**
-     *最后一次更新时间
-     */
-    private Date updtTime;
-    /**
-     *固定电话
-     */
+
+    //(value = "统一社会信用代码")
+    @TableField("USCC")
+    private String uscc;
+
+    //(value = "企业代码")
+    @TableField("ENTP_CODE")
+    private String entpCode;
+
+    //(value = "生产企业")
+    @TableField("ORG_NAME")
+    private String orgName;
+
+    //(value = "企业类型")
+    @TableField("ORG_TYPEID")
+    private String orgTypeid;
+
+    //(value = "联系人")
+    @TableField("CONER")
+    private String coner;
+
+    //(value = "联系电话")
+    @TableField("CONER_MOD")
+    private String conerMod;
+
+    //(value = "固定电话")
+    @TableField("FIX_TEL")
     private String fixTel;
+
+    //(value = "最后一次更新时间")
+    @TableField("UPDT_TIME")
+    private Date updtTime;
+
 }

@@ -6,13 +6,14 @@ import com.common.config.SystemConfig;
 import com.common.entity.IntfResponseBody;
 import com.common.service.MiddleRequestService;
 import com.trade.model.BaseHospitalInfo;
-import com.trade.service.BaseHospitalInfoManager;
+import com.trade.service.BaseHospitalInfoService;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class BaseHospitalInfoJob implements BaseJob {
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private BaseHospitalInfoManager baseHospitalInfoManager = QuartzConfig.getBean(BaseHospitalInfoManager.class);
+    private BaseHospitalInfoService baseHospitalInfoService = QuartzConfig.getBean(BaseHospitalInfoService.class);
      private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
 
     @Override
@@ -36,23 +37,32 @@ public class BaseHospitalInfoJob implements BaseJob {
 
     public void  syncDatas( int page){
         log.info("医疗机构接口查询");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        JSONObject data = new JSONObject();
+        data.put("currentPageNumber", page);
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -15);
+        data.put("strUpTime",sdf.format(cal.getTime()));
+        data.put("endUpTime",sdf.format(date));
 
-        JSONObject data=new JSONObject();
-        data.put("current",page);
-        data.put("size",100);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_HOSPITAL, data);
         try {
             //1.解析结果
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
-                if(page==1){
-                    baseHospitalInfoManager.deleteAllDatas();
-                }
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                List<BaseHospitalInfo>  hospitalInfos= JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
-                baseHospitalInfoManager.saveBatch(hospitalInfos);
-                if(page<outputData.getInteger("totalPageCount")){
-                    syncDatas( ++page);
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<BaseHospitalInfo> hospitalInfos = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
+                    if (hospitalInfos.size() > 0){
+                        baseHospitalInfoService.saveOrUpdateBatch(hospitalInfos);
+                        if(page<outputData.getInteger("totalPageCount")){
+                            syncDatas(++page);
+                        }
+                    }
+                }else {
+                    log.info("调用医疗机构接口失败======"+body.getErr_msg());
                 }
             }else {
                 log.info("调用医疗机构接口失败======"+body.getErr_msg());

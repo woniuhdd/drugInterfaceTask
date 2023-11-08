@@ -12,6 +12,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -35,26 +36,42 @@ public class BaseDrugInfoJob implements BaseJob {
         log.info("获取商品信息任务执行的时间：" + dateFormat.format(new Date()));
     }
 
-    public void  syncDatas(int page) throws Exception {
+    public void  syncDatas(int page){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         JSONObject data = new JSONObject();
-        data.put("current", page);
-        data.put("size", 100);
+        data.put("currentPageNumber", page);
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -15);
+        data.put("startTime",sdf.format(cal.getTime()));
+        data.put("endTime",sdf.format(date));
 
         String requestBody = requestService.getRequestBody(SystemConfig.GET_DRUG, data);
         try {
             //1.解析结果
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
-            JSONObject resultData = body.getOutput().getJSONObject("data");
-            if (resultData.getInteger("returnCode") == 0) {
-                List<BaseDrugInfo> druginfos = JSONArray.parseArray(resultData.getString("dataList"), BaseDrugInfo.class);
-                baseDrugInfoService.saveOrUpdateBatch(druginfos);
-                if (page < resultData.getInteger("totalPageCount")) {
-                    syncDatas(++page);
+            if(body.getInfcode()==0){
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if ("1".equals(outputData.getString("returnCode"))) {
+                    List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
+                    if (druginfos.size() > 0){
+                        baseDrugInfoService.saveOrUpdateBatch(druginfos);
+                        if (page < outputData.getInteger("totalPageCount")) {
+                            syncDatas(++page);
+                        }
+                    }
+                }else {
+                    log.info("获取商品信息失败======"+body.getErr_msg());
                 }
+            }else {
+                log.info("获取商品信息失败======"+body.getErr_msg());
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            log.info("获取商品信息异常");
         }
     }
 
