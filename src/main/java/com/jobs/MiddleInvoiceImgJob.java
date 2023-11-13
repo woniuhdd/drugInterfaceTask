@@ -56,15 +56,11 @@ public class MiddleInvoiceImgJob implements BaseJob {
             String requestParam = requestService.getRequestBody(SystemConfig.SEND_INVOICE_IMG, data);
             try {
                 //1.解析结果
-                IntfResponseBody body =requestService.getDataByUrl(SystemConfig.UPLOAD_DRUGINVO_FILE,requestParam);
-                if(body.getInfcode()==0){
-                    JSONObject outputData = body.getOutput().getJSONObject("data");
+                IntfResponseBody body =requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestParam);
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
                     invoiceImg.setFileId(outputData.getString("fileId"));
-                    if("0".equals(outputData.getString("returnCode"))){
-                        invoiceImg.setResponseState("2");
-                    }else{
-                        invoiceImg.setResponseState("3");
-                    }
+                    invoiceImg.setResponseState("2");
                     invoiceImg.setResponseInfo(outputData.getString("returnMsg"));
                 }else {
                     log.info("发票附件上传接口失败======"+body.getErr_msg());
@@ -118,7 +114,6 @@ public class MiddleInvoiceImgJob implements BaseJob {
                 }
             }
         }
-
         return jsonObject;
     }
 }

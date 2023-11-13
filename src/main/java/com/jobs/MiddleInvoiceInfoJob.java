@@ -19,7 +19,8 @@ public class MiddleInvoiceInfoJob implements BaseJob {
     private static final Logger log = LoggerFactory.getLogger(MiddleInvoiceInfoJob.class);
 
     private MiddleInvoiceInfoService invoiceInfoService = QuartzConfig.getBean(MiddleInvoiceInfoService.class);
-     private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
+    private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
+
     @Override
     public void execute(JobExecutionContext context) {
         try {
@@ -44,7 +45,7 @@ public class MiddleInvoiceInfoJob implements BaseJob {
             data.put("invoCode",invoiceInfo.getInvoCode());
             data.put("invono",invoiceInfo.getInvono());
             data.put("billAmt",invoiceInfo.getBillAmt());
-            data.put("billTime",invoiceInfo.getBillTime());
+            data.put("billTime",DateUtil.dateFormat(invoiceInfo.getBillTime()));
             data.put("invottl",invoiceInfo.getInvottl());
             data.put("invoMemo",invoiceInfo.getInvoMemo());
             String requestBody = requestService.getRequestBody(SystemConfig.SEND_INVOICE_INFO, data);
@@ -52,14 +53,10 @@ public class MiddleInvoiceInfoJob implements BaseJob {
             try {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
-                if(body.getInfcode()==0){
-                    JSONObject outputData = body.getOutput().getJSONObject("data");
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
                     invoiceInfo.setInvoId(outputData.getString("invoId"));
-                    if("0".equals(outputData.getString("returnCode"))){
-                        invoiceInfo.setResponseState("2");
-                    }else{
-                        invoiceInfo.setResponseState("3");
-                    }
+                    invoiceInfo.setResponseState("2");
                     invoiceInfo.setResponseInfo(outputData.getString("returnMsg"));
                 }else {
                     log.info("维护发票信息接口失败======"+body.getErr_msg());
