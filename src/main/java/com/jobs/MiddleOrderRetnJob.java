@@ -12,6 +12,7 @@ import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,10 @@ public class MiddleOrderRetnJob implements BaseJob {
         Date now=new Date();
         data.put("currentPageNumber", String.valueOf(page));
         //订单发送日期
-        data.put("strUpTime", DateUtil.dateFormat(now));
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.DATE, -1);
+        data.put("strUpTime", DateUtil.dateFormat(cal.getTime()));
         data.put("endUpTime", DateUtil.dateFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
 
@@ -47,10 +51,16 @@ public class MiddleOrderRetnJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
-                middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
-                if(page<outputData.getInteger("totalPageCount")){
-                    syncDatas( ++page);
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
+                    if (middleOrderRetnList.size() > 0){
+                        middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
+                        if(page<outputData.getInteger("totalPageCount")){
+                            syncDatas( ++page);
+                        }
+                    }
+                }else {
+                    log.info("调用退货订单接口失败======"+body.getErr_msg());
                 }
             }else {
                 log.info("调用退货订单接口失败======"+body.getErr_msg());

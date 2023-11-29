@@ -47,6 +47,8 @@ public class TestController {
     private MiddleInvoiceService invoiceService;
     @Autowired
     private MiddleInvoiceShpService invoiceShpService;
+    @Autowired
+    private MiddleOrderRetnService middleOrderRetnService;
 
     @RequestMapping(value = "/getBaseCompanyInfoList", method = {RequestMethod.POST})
     @ResponseBody
@@ -237,6 +239,7 @@ public class TestController {
         returnJsonObj.put("resultMsg", "调用采购订单接口失败");
         return returnJsonObj;
     }
+
 
     @RequestMapping(value = "/getMiddleInvoiceInfoList", method = {RequestMethod.POST})
     @ResponseBody
@@ -470,4 +473,49 @@ public class TestController {
 
         return returnJsonObj;
     }
+
+    @RequestMapping(value = "/getMiddleOrderRetnList", method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject getMiddleOrderRetnList(String startTime, String endTime,int page) {
+        JSONObject data = new JSONObject();
+        data.put("currentPageNumber",page);
+        data.put("strUpTime",startTime);
+        data.put("endUpTime",endTime);
+        String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
+        try {
+            IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
+            if(body.getInfcode()==0){
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
+                    if (middleOrderRetnList.size() > 0){
+                        middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
+                        if(page<outputData.getInteger("totalPageCount")){
+                            getMiddleOrderRetnList(startTime,endTime,++page);
+                        }
+                    }
+                }else {
+                    log.info("调用退货订单接口失败======"+body.getErr_msg());
+                }
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "1");
+                returnJsonObj.put("resultMsg", "共获取"+outputData.getInteger("totalRecordCount"));
+                return returnJsonObj;
+            }else {
+                log.info("调用退货订单接口失败======"+body.getErr_msg());
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "0");
+                returnJsonObj.put("resultMsg", body.getErr_msg());
+                return returnJsonObj;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("调用退货订单接口失败");
+        }
+        JSONObject returnJsonObj = new JSONObject();
+        returnJsonObj.put("resultCode", "0");
+        returnJsonObj.put("resultMsg", "调用退货订单接口失败");
+        return returnJsonObj;
+    }
+
 }

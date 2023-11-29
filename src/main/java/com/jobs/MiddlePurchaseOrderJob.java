@@ -38,7 +38,7 @@ public class MiddlePurchaseOrderJob implements BaseJob {
         //订单发送日期
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
+        cal.add(Calendar.DATE, -1);
         data.put("startTime", DateUtil.dateFormat(cal.getTime()));
         data.put("endTime", DateUtil.dateFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
