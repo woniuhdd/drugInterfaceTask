@@ -32,8 +32,7 @@ public class MiddleOrderShpJob implements BaseJob {
     }
 
     public void  syncDatas(int page){
-        log.info("采购收货信息接口查询");
-
+        log.info("获取收货信息接口查询");
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_SHP, data);
@@ -42,10 +41,16 @@ public class MiddleOrderShpJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
-                middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
-                if(page<outputData.getInteger("totalPageCount")){
-                    syncDatas(++page);
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
+                    if (middleOrderShpList.size() > 0){
+                        middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
+                        if(page<outputData.getInteger("totalPageCount")){
+                            syncDatas(++page);
+                        }
+                    }
+                }else {
+                    log.info("调用收货信息接口失败======"+body.getErr_msg());
                 }
             }else {
                 log.info("调用收货信息接口失败======"+body.getErr_msg());
