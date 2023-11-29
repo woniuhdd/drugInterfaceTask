@@ -8,12 +8,12 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class MiddleInvoiceImg {
+public class MiddleFiles {
 
-    @TableId(value = "uuid")
-    private String 	uuid	;//	企业主键
+    @TableId(value = "MIDDLE_FILE_ID")
+    private String 	middleFileId	;//	企业主键
     private String 	invoId	;//	发票编号(发票表的INVO_ID)
-    private String 	imgUrl	;//	发票图片地址
+    private String 	fileUrl	;//	发票图片地址
     private String 	fileName	;//	附件名称
     private String 	fileId	;//	省平台返回文件地址
     private String 	responseState	;//	省平台交互状态(0:未交互  2:上传成功  3:上传失败)

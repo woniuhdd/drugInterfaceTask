@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -39,9 +40,13 @@ public class TestController {
     @Autowired
     private MiddlePurchaseOrderService middlePurchaseOrderService;
     @Autowired
-    private MiddleInvoiceInfoService invoiceInfoService;
+    private MiddleInvoiceResponseService invoiceInfoService;
     @Autowired
-    private MiddleInvoiceImgService invoiceImgService;
+    private MiddleFilesService invoiceImgService;
+    @Autowired
+    private MiddleInvoiceService invoiceService;
+    @Autowired
+    private MiddleInvoiceShpService invoiceShpService;
 
     @RequestMapping(value = "/getBaseCompanyInfoList", method = {RequestMethod.POST})
     @ResponseBody
@@ -233,14 +238,60 @@ public class TestController {
         return returnJsonObj;
     }
 
+    @RequestMapping(value = "/getMiddleInvoiceInfoList", method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject getMiddleInvoiceInfoList(String startTime, String endTime,int page) {
+        JSONObject data = new JSONObject();
+        data.put("currentPageNumber",page);
+        data.put("startTime",startTime);
+        data.put("endTime",endTime);
+        String requestBody = requestService.getRequestBody(SystemConfig.GET_INVOICE_INFO, data);
+        try {
+            IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
+            //1.解析结果
+            if(body.getInfcode()==0){
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
+                    if (invoiceList.size() > 0){
+                        invoiceService.saveOrUpdateBatch(invoiceList);
+                        if(page < outputData.getInteger("totalPageCount")){
+                            getMiddleInvoiceInfoList(startTime,endTime,++page);
+                        }
+                    }
+                }else{
+                    log.info("调用获取发票信息接口失败======"+body.getErr_msg());
+                }
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "1");
+                returnJsonObj.put("resultMsg", "共获取"+outputData.getInteger("totalRecordCount"));
+                return returnJsonObj;
+            }else {
+                log.info("调用获取发票信息接口失败======"+body.getErr_msg());
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "0");
+                returnJsonObj.put("resultMsg", body.getErr_msg());
+                return returnJsonObj;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("调用获取发票信息接口失败");
+        }
+        JSONObject returnJsonObj = new JSONObject();
+        returnJsonObj.put("resultCode", "0");
+        returnJsonObj.put("resultMsg", "调用采购订单接口失败");
+        return returnJsonObj;
+    }
+
+
     @RequestMapping(value = "/sendInvoiceInfo", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject sendInvoiceInfo() {
         JSONObject returnJsonObj = new JSONObject();
 
-        LambdaQueryWrapper<MiddleInvoiceInfo> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceInfo>().
-                eq(MiddleInvoiceInfo::getResponseState,"0");
-        List<MiddleInvoiceInfo> invoiceInfos = invoiceInfoService.list(queryWrapper);
+        LambdaQueryWrapper<MiddleInvoiceResponse> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceResponse>().
+                eq(MiddleInvoiceResponse::getResponseState,"0");
+        List<MiddleInvoiceResponse> invoiceInfos = invoiceInfoService.list(queryWrapper);
         invoiceInfos.forEach(invoiceInfo->{
             JSONObject data=new JSONObject();
             data.put("invoId",invoiceInfo.getInvoId());
@@ -258,7 +309,7 @@ public class TestController {
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
                 if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
-                    invoiceInfo.setInvoId(outputData.getString("invoId"));
+                    invoiceInfo.setRetnInvoId(outputData.getString("invoId"));
                     invoiceInfo.setResponseState("2");
                     invoiceInfo.setResponseInfo(outputData.getString("returnMsg"));
                     returnJsonObj.put("resultCode", "1");
@@ -289,9 +340,9 @@ public class TestController {
     public JSONObject uploadInvoiceImg() {
         JSONObject returnJsonObj = new JSONObject();
         //查询未交互的发票图片
-        LambdaQueryWrapper<MiddleInvoiceImg> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceImg>().
-                eq(MiddleInvoiceImg::getResponseState,"0");
-        List<MiddleInvoiceImg> invoiceImgs = invoiceImgService.list(queryWrapper);
+        LambdaQueryWrapper<MiddleFiles> queryWrapper=new LambdaQueryWrapper<MiddleFiles>().
+                eq(MiddleFiles::getResponseState,"0");
+        List<MiddleFiles> invoiceImgs = invoiceImgService.list(queryWrapper);
         invoiceImgs.forEach(invoiceImg->{
             JSONObject object = getFileBase64Str(invoiceImg);
             if(object.getString("code").equals("0")){
@@ -335,29 +386,29 @@ public class TestController {
         return returnJsonObj;
     }
 
-    public JSONObject getFileBase64Str(MiddleInvoiceImg invoiceImg){
+    public JSONObject getFileBase64Str(MiddleFiles invoiceImg){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", "1");
         jsonObject.put("msg", "成功");
         FileInputStream fileInputStream=null;
         try {
-            if (StringUtils.isEmpty(invoiceImg.getImgUrl())) {
+            if (StringUtils.isEmpty(invoiceImg.getFileUrl())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceImg.getMiddleFileId()));
                 return jsonObject;
             }
             if (StringUtils.isEmpty(invoiceImg.getInvoId())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceImg.getMiddleFileId()));
                 return jsonObject;
             }
             if (!(invoiceImg.getFileName().toLowerCase().endsWith(".jpg")||
                     invoiceImg.getFileName().toLowerCase().endsWith(".png"))) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceImg.getMiddleFileId()));
                 return jsonObject;
             }
-            File file = new File(invoiceImg.getImgUrl());
+            File file = new File(invoiceImg.getFileUrl());
             byte[] fileBase64Byte=new byte[(int)file.length()];
             fileInputStream=new FileInputStream(file);
             fileInputStream.read(fileBase64Byte);
@@ -374,5 +425,49 @@ public class TestController {
             }
         }
         return jsonObject;
+    }
+
+    @RequestMapping(value = "/sendInvoiceShp", method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject sendInvoiceShp() {
+        JSONObject returnJsonObj = new JSONObject();
+
+        LambdaQueryWrapper<MiddleInvoiceShp> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceShp>().
+                eq(MiddleInvoiceShp::getResponseState,"0");
+        List<MiddleInvoiceShp> invoiceShps = invoiceShpService.list(queryWrapper);
+        invoiceShps.forEach(invoiceShp->{
+            JSONObject data=new JSONObject();
+            data.put("invoIds", Arrays.asList(invoiceShp.getInvoId()));
+            data.put("invoType",invoiceShp.getInvoType());
+            data.put("shpId",invoiceShp.getShpId());
+            String requestBody = requestService.getRequestBody(SystemConfig.SEND_INVOICE_SHP, data);
+            try {
+                //1.解析结果
+                IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                    invoiceShp.setResponseState("2");
+                    invoiceShp.setResponseInfo(outputData.getString("returnMsg"));
+                    returnJsonObj.put("resultCode", "1");
+                    returnJsonObj.put("resultMsg", "药品设置发票成功");
+
+                }else {
+                    log.info("药品设置发票接口失败======"+body.getErr_msg());
+                    invoiceShp.setResponseState("3");
+                    invoiceShp.setResponseInfo(body.getErr_msg());
+                    returnJsonObj.put("resultCode", "0");
+                    returnJsonObj.put("resultMsg", body.getErr_msg());
+                }
+                invoiceShp.setResponseTime(new Date());
+                invoiceShpService.updateById(invoiceShp);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info("药品设置发票接口异常");
+                returnJsonObj.put("resultCode", "0");
+                returnJsonObj.put("resultMsg", "药品设置发票接口异常");
+            }
+        });
+
+        return returnJsonObj;
     }
 }

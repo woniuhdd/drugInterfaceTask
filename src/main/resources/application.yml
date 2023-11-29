@@ -54,6 +54,6 @@ logging:
 
 
 intf:
-  appCode: b016ddaa78a24103867e327023386fc1 #接口调用凭证应用码
-  authCode: 5750aa105c624a9599c4592f49049f60 #接口调用凭证授权码
+  appCode: b9266895aace4121a4bf48bf71b72781 #接口调用凭证应用码
+  authCode: ae16914cc5b746d89ca707ee568e5209 #接口调用凭证授权码
   url: http://60.31.22.187:9100 #接口请求地址

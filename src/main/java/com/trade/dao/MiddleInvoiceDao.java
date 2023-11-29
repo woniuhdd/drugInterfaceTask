@@ -1,9 +1,9 @@
 package com.trade.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.trade.model.MiddleOrderDis;
+import com.trade.model.MiddleInvoice;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface MiddleOrderDisDao extends BaseMapper<MiddleOrderDis> {
+public interface MiddleInvoiceDao extends BaseMapper<MiddleInvoice> {
 }

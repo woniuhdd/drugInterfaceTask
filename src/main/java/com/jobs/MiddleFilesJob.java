@@ -6,8 +6,8 @@ import com.common.config.SystemConfig;
 import com.common.entity.IntfResponseBody;
 import com.common.service.MiddleRequestService;
 import com.common.utils.DateUtil;
-import com.trade.model.MiddleInvoiceImg;
-import com.trade.service.MiddleInvoiceImgService;
+import com.trade.model.MiddleFiles;
+import com.trade.service.MiddleFilesService;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -18,10 +18,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public class MiddleInvoiceImgJob implements BaseJob {
-    private static final Logger log = LoggerFactory.getLogger(MiddleInvoiceImgJob.class);
+public class MiddleFilesJob implements BaseJob {
+    private static final Logger log = LoggerFactory.getLogger(MiddleFilesJob.class);
 
-    private MiddleInvoiceImgService invoiceImgService = QuartzConfig.getBean(MiddleInvoiceImgService.class);
+    private MiddleFilesService filesService = QuartzConfig.getBean(MiddleFilesService.class);
     private MiddleRequestService requestService=QuartzConfig.getBean(MiddleRequestService.class);
 
     @Override
@@ -37,38 +37,38 @@ public class MiddleInvoiceImgJob implements BaseJob {
     public void  syncDatas(){
         log.info("发票附件上传接口查询");
         //查询未交互的发票图片
-        LambdaQueryWrapper<MiddleInvoiceImg> queryWrapper=new LambdaQueryWrapper<MiddleInvoiceImg>().
-                eq(MiddleInvoiceImg::getResponseState,"0");
-        List<MiddleInvoiceImg> invoiceImgs = invoiceImgService.list(queryWrapper);
-        invoiceImgs.forEach(invoiceImg->{
-            JSONObject object = getFileBase64Str(invoiceImg);
+        LambdaQueryWrapper<MiddleFiles> queryWrapper=new LambdaQueryWrapper<MiddleFiles>().
+                eq(MiddleFiles::getResponseState,"0");
+        List<MiddleFiles> files = filesService.list(queryWrapper);
+        files.forEach(invoiceFile->{
+            JSONObject object = getFileBase64Str(invoiceFile);
             if(object.getString("code").equals("0")){
-                invoiceImg.setResponseState("3");
-                invoiceImg.setResponseInfo(object.getString("msg"));
-                invoiceImg.setResponseTime(new Date());
-                invoiceImgService.updateById(invoiceImg);
+                invoiceFile.setResponseState("3");
+                invoiceFile.setResponseInfo(object.getString("msg"));
+                invoiceFile.setResponseTime(new Date());
+                filesService.updateById(invoiceFile);
                 return;
             }
             JSONObject data=new JSONObject();
-            data.put("invoId",invoiceImg.getInvoId());
+            data.put("invoId",invoiceFile.getInvoId());
             data.put("fileBase64Str",object.getString("fileBase64Str"));
-            data.put("fileName",invoiceImg.getFileName());
+            data.put("fileName",invoiceFile.getFileName());
             String requestParam = requestService.getRequestBody(SystemConfig.SEND_INVOICE_IMG, data);
             try {
                 //1.解析结果
                 IntfResponseBody body =requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestParam);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
                 if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
-                    invoiceImg.setFileId(outputData.getString("fileId"));
-                    invoiceImg.setResponseState("2");
-                    invoiceImg.setResponseInfo(outputData.getString("returnMsg"));
+                    invoiceFile.setFileId(outputData.getString("fileId"));
+                    invoiceFile.setResponseState("2");
+                    invoiceFile.setResponseInfo(outputData.getString("returnMsg"));
                 }else {
                     log.info("发票附件上传接口失败======"+body.getErr_msg());
-                    invoiceImg.setResponseState("3");
-                    invoiceImg.setResponseInfo(body.getErr_msg());
+                    invoiceFile.setResponseState("3");
+                    invoiceFile.setResponseInfo(body.getErr_msg());
                 }
-                invoiceImg.setResponseTime(new Date());
-                invoiceImgService.updateById(invoiceImg);
+                invoiceFile.setResponseTime(new Date());
+                filesService.updateById(invoiceFile);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.info("发票附件上传接口异常");
@@ -76,29 +76,29 @@ public class MiddleInvoiceImgJob implements BaseJob {
         });
     }
 
-    public JSONObject getFileBase64Str(MiddleInvoiceImg invoiceImg){
+    public JSONObject getFileBase64Str(MiddleFiles invoiceFile){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", "1");
         jsonObject.put("msg", "成功");
         FileInputStream fileInputStream=null;
         try {
-            if (StringUtils.isEmpty(invoiceImg.getImgUrl())) {
+            if (StringUtils.isEmpty(invoiceFile.getFileUrl())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            if (StringUtils.isEmpty(invoiceImg.getInvoId())) {
+            if (StringUtils.isEmpty(invoiceFile.getInvoId())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            if (!(invoiceImg.getFileName().toLowerCase().endsWith(".jpg")||
-                    invoiceImg.getFileName().toLowerCase().endsWith(".png"))) {
+            if (!(invoiceFile.getFileName().toLowerCase().endsWith(".jpg")||
+                    invoiceFile.getFileName().toLowerCase().endsWith(".png"))) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceImg.getUuid()));
+                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            File file = new File(invoiceImg.getImgUrl());
+            File file = new File(invoiceFile.getFileUrl());
             byte[] fileBase64Byte=new byte[(int)file.length()];
             fileInputStream=new FileInputStream(file);
             fileInputStream.read(fileBase64Byte);
