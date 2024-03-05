@@ -14,8 +14,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +52,7 @@ public class MiddleRequestServiceImpl implements MiddleRequestService {
         headers.add("content-type","application/json;charset=utf-8");
         HttpEntity<String> reqBody=new HttpEntity<>(requestParam,headers);
         try {
+
             ResponseEntity<IntfResponseBody> responseEntity = restTemplate.exchange(intfUrl+url,
                     HttpMethod.POST, reqBody, IntfResponseBody.class);
             //1.解析结果
@@ -64,6 +63,11 @@ public class MiddleRequestServiceImpl implements MiddleRequestService {
                 IntfRequestBody requestBody = JSONObject.parseObject(requestParam, IntfRequestBody.class);
                 requestBody.getInfo().getInput().get("data").put("accessToken",token);
                 return getDataByUrl(url,JSONObject.toJSONString(requestBody));
+            }
+            if("该接口访问间隔为5秒！".equals(body.getErr_msg())){
+                log.info("该接口访问间隔为5秒！");
+                Thread.sleep(5000);
+                return getDataByUrl(url,requestParam);
             }
         } catch (Exception e) {
             log.error("调用药品接口异常:{}",e.getMessage());
