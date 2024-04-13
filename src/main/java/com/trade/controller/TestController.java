@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -51,6 +48,8 @@ public class TestController {
     private MiddleOrderRetnService middleOrderRetnService;
     @Autowired
     private MiddleOrderShpService middleOrderShpService;
+    @Autowired
+    private MiddleOrderDisService orderDisService;
 
     @RequestMapping(value = "/getBaseCompanyInfoList", method = {RequestMethod.POST})
     @ResponseBody
@@ -560,4 +559,62 @@ public class TestController {
         return returnJsonObj;
     }
 
+
+    @RequestMapping(value = "/sendOrderDis", method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject sendOrderDis() {
+        JSONObject returnJsonObj = new JSONObject();
+
+        //查询未交互的配送信息
+        LambdaQueryWrapper<MiddleOrderDis> queryWrapper=new LambdaQueryWrapper<MiddleOrderDis>().
+                eq(MiddleOrderDis::getResponseState,"0");
+        List<MiddleOrderDis> orderDisList = orderDisService.list(queryWrapper);
+        orderDisList.forEach(orderDis->{
+            JSONObject data=new JSONObject();
+            List<Map<String,Object>> dataList = new ArrayList<>();
+            Map<String,Object> map = new HashMap<>();
+            map.put("shpId",orderDis.getShpId());
+            map.put("shpCnt",orderDis.getShpCnt());
+            map.put("manuLotnum",orderDis.getManuLotnum());
+            map.put("expyEndtime",orderDis.getExpyEndtime());
+            map.put("shpMemo",orderDis.getShpMemo());
+            dataList.add(map);
+            data.put("dataList",dataList);
+            String requestBody = requestService.getRequestBody(SystemConfig.SEND_ORDER_DIS, data);
+
+            try {
+                //1.解析结果
+                IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
+                if(body.getInfcode()==0){
+                    JSONObject outputData = body.getOutput().getJSONObject("data");
+                    if("0".equals(outputData.getString("returnCode"))){
+                        orderDis.setResponseState("2");
+                        returnJsonObj.put("resultCode", "1");
+                        returnJsonObj.put("resultMsg", "上传发货信息成功，shpId："+orderDis.getShpId());
+                    }else{
+                        orderDis.setResponseState("3");
+                        returnJsonObj.put("resultCode", "0");
+                        returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId());
+                    }
+                    orderDis.setResponseInfo(outputData.getString("returnMsg"));
+
+                }else {
+                    log.info("药品发货信息上传接口失败======"+body.getErr_msg());
+                    orderDis.setResponseState("3");
+                    orderDis.setResponseInfo(body.getErr_msg());
+                    returnJsonObj.put("resultCode", "0");
+                    returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId()+","+body.getErr_msg());
+                }
+                orderDis.setResponseTime(new Date());
+                orderDisService.updateById(orderDis);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info("药品发货信息上传接口异常");
+                returnJsonObj.put("resultCode", "0");
+                returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId()+","+e.getMessage());
+            }
+        });
+
+        return returnJsonObj;
+    }
 }

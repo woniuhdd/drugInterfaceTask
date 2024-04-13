@@ -13,8 +13,8 @@ public class MiddlePurchaseOrder {
 
     private String 	ordId	;//	订单 ID
     private String 	ordCode	;//	订单 CODE
-    @TableId(value = "ORD_DETL_ID", type = IdType.ID_WORKER_STR)
     private String 	ordDetlId	;//	订单明细 ID
+    @TableId(value = "SHP_ID", type = IdType.ID_WORKER_STR)
     private String 	shpId	;//	发货 ID
     private Double	pubonlnPric	;//	挂网价格
     private Double	purcpric	;//	采购价格

@@ -39,7 +39,7 @@ public class MiddlePurchaseOrderJob implements BaseJob {
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
         cal.add(Calendar.DATE, -1);
-        data.put("startTime", DateUtil.dateFormat(cal.getTime()));
+        data.put("startTime", "2024-01-01");
         data.put("endTime", DateUtil.dateFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
         try {

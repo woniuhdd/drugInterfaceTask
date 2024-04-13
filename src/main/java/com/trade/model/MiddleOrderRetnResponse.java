@@ -18,7 +18,7 @@ import java.util.Date;
  * @since 2023-08-23
  */
 @Data
-@TableName("MIDDLE_ORDER_RETN_RESPONSE")
+@TableName("MIDDLE_RETN_ORDER_RESPONSE")
 public class MiddleOrderRetnResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
