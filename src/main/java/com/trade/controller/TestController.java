@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 @RestController
@@ -616,5 +614,30 @@ public class TestController {
         });
 
         return returnJsonObj;
+    }
+
+
+    @RequestMapping(value = "/getMiddlePurchaseOrderListNew", method = {RequestMethod.POST})
+    @ResponseBody
+    public JSONObject getMiddlePurchaseOrderListNew() throws IOException {
+        String dataList ;
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Administrator\\Desktop\\111\\2.txt"));
+        while((dataList=reader.readLine())!=null){
+            stringBuilder.append(dataList);
+        }
+        List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(stringBuilder.toString(), MiddlePurchaseOrder.class);
+        if (middlePurchaseOrderList.size() > 0){
+            middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
+        }
+        JSONObject returnJsonObj = new JSONObject();
+        returnJsonObj.put("resultCode", "0");
+        returnJsonObj.put("resultMsg", "调用采购订单接口失败");
+        return returnJsonObj;
+
+
+
+
+
     }
 }

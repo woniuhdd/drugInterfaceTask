@@ -11,10 +11,11 @@ import java.util.Date;
 @NoArgsConstructor
 public class MiddlePurchaseOrder {
 
+    private String 	id	;
     private String 	ordId	;//	订单 ID
     private String 	ordCode	;//	订单 CODE
     private String 	ordDetlId	;//	订单明细 ID
-    @TableId(value = "SHP_ID", type = IdType.ID_WORKER_STR)
+//    @TableId(value = "SHP_ID", type = IdType.ID_WORKER_STR)
     private String 	shpId	;//	发货 ID
     private Double	pubonlnPric	;//	挂网价格
     private Double	purcpric	;//	采购价格
@@ -67,4 +68,62 @@ public class MiddlePurchaseOrder {
     private String 	readFlag	;//	是否已读 0未读 1已读
     private Date 	readTime	;//	订单已读时间
 
+
+    private Double avlShpCnt;
+
+    private Date expyEndtime;
+
+    private String retnList;
+
+    private Double pubOnlinePric;
+
+    private String retnInvo;
+
+    private Date shpTime;
+
+    private Double invoAmt;
+
+    private String selInvoTwo;
+
+    private String itemname;
+
+    private String selInvoOne;
+
+    private String pubonlnDelvExtId;
+
+    private Double rtnbCnt;
+
+    private String crterName;
+
+    private String planDetlMemo;
+
+    private String selList;
+
+    private Double retnCnt;
+
+    private String highSelLmtpric;
+
+    private Double shppPric;
+
+    private String purcPlanCode;
+
+    private Double hiPayPric;
+
+    private String selInvoScd;
+
+    private String outstoStas;
+
+    private String planMemo;
+
+    private String manuLotnum;
+
+    private String rpupCntFlag;
+
+    private Double rtndCnt;
+
+    private String shpCode;
+
+    private String outstoStasVal;
+
+    private String prodAttrs;
 }
