@@ -1,21 +1,23 @@
 package com.jobs;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.common.InterfaceConfigHelper;
 import com.common.config.SystemConfig;
 import com.common.entity.IntfResponseBody;
 import com.common.service.MiddleRequestService;
 import com.common.utils.DateUtil;
+import com.enums.HttpStatusEnum;
 import com.trade.model.MiddleFiles;
 import com.trade.service.MiddleFilesService;
+import okhttp3.*;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class MiddleFilesJob implements BaseJob {
@@ -80,7 +82,8 @@ public class MiddleFilesJob implements BaseJob {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", "1");
         jsonObject.put("msg", "成功");
-        FileInputStream fileInputStream=null;
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        InputStream inputStream = null;
         try {
             if (StringUtils.isEmpty(invoiceFile.getFileUrl())) {
                 jsonObject.put("code", "0");
@@ -98,22 +101,51 @@ public class MiddleFilesJob implements BaseJob {
                 jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            File file = new File(invoiceFile.getFileUrl());
-            byte[] fileBase64Byte=new byte[(int)file.length()];
-            fileInputStream=new FileInputStream(file);
-            fileInputStream.read(fileBase64Byte);
+            Request request = (new okhttp3.Request.Builder()).get().url(invoiceFile.getFileUrl()).build();
+            Call call = InterfaceConfigHelper.okHttpClient.newCall(request);
+            Response response = call.execute();
+
+            if (response.code() != HttpStatusEnum.OK.getKey()) {
+                jsonObject.put("code", "0");
+                jsonObject.put("msg", String.format("下载网络地址图片到本地阶段-->下载图片失败（数据库主键编号：%s），请求HTTP状态为：%s（%s）。", invoiceFile.getMiddleFileId(), HttpStatusEnum.getValueByKey(response.code()), response.code()));
+                return jsonObject;
+            }
+            inputStream = response.body().byteStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while((len = inputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            byte[] fileBase64Byte = outStream.toByteArray();
             jsonObject.put("fileBase64Str",Base64.getEncoder().encodeToString(fileBase64Byte));
         } catch (Exception e) {
             e.printStackTrace();
+            jsonObject.put("code", "0");
+            jsonObject.put("msg", String.format("获取图片-->图片获取失败：", e.getMessage()));
+            return jsonObject;
         }finally {
-            if(fileInputStream!=null) {
+            if(inputStream!=null) {
                 try {
-                    fileInputStream.close();
+                    inputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", String.format("关闭输入流失败-->", e.getMessage()));
+                    return jsonObject;
+                }
+            }
+            if(outStream!=null) {
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", String.format("关闭输出流失败-->", e.getMessage()));
+                    return jsonObject;
                 }
             }
         }
         return jsonObject;
     }
+
 }
