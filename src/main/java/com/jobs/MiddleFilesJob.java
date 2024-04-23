@@ -1,6 +1,5 @@
 package com.jobs;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.common.InterfaceConfigHelper;
@@ -95,8 +94,8 @@ public class MiddleFilesJob implements BaseJob {
                 jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            if (!(invoiceFile.getFileName().toLowerCase().endsWith(".jpg")||
-                    invoiceFile.getFileName().toLowerCase().endsWith(".png"))) {
+            if (!(invoiceFile.getFileName().equalsIgnoreCase("jpg")||
+                    invoiceFile.getFileName().equalsIgnoreCase("png"))) {
                 jsonObject.put("code", "0");
                 jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceFile.getMiddleFileId()));
                 return jsonObject;
