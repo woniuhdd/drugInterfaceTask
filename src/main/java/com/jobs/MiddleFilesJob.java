@@ -51,9 +51,10 @@ public class MiddleFilesJob implements BaseJob {
                 return;
             }
             JSONObject data=new JSONObject();
+            String url = invoiceFile.getFileUrl();
             data.put("invoId",invoiceFile.getInvoId());
             data.put("fileBase64Str",object.getString("fileBase64Str"));
-            data.put("fileName",invoiceFile.getFileName());
+            data.put("fileName",url.substring(url.lastIndexOf("/")+1));
             String requestParam = requestService.getRequestBody(SystemConfig.SEND_INVOICE_IMG, data);
             try {
                 //1.解析结果

@@ -3,13 +3,18 @@ package com.trade.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.common.InterfaceConfigHelper;
 import com.common.config.SystemConfig;
 import com.common.entity.IntfResponseBody;
 import com.common.service.MiddleRequestService;
 import com.common.utils.DateUtil;
+import com.enums.HttpStatusEnum;
 import com.trade.model.*;
 import com.trade.service.*;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -355,9 +360,10 @@ public class TestController {
                 return;
             }
             JSONObject data=new JSONObject();
+            String url = invoiceImg.getFileUrl();
             data.put("invoId",invoiceImg.getInvoId());
             data.put("fileBase64Str",object.getString("fileBase64Str"));
-            data.put("fileName",invoiceImg.getFileName());
+            data.put("fileName",url.substring(url.lastIndexOf("/")+1));
             String requestParam = requestService.getRequestBody(SystemConfig.SEND_INVOICE_IMG, data);
             try {
                 //1.解析结果
@@ -388,41 +394,70 @@ public class TestController {
         return returnJsonObj;
     }
 
-    public JSONObject getFileBase64Str(MiddleFiles invoiceImg){
+    public JSONObject getFileBase64Str(MiddleFiles invoiceFile){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", "1");
         jsonObject.put("msg", "成功");
-        FileInputStream fileInputStream=null;
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        InputStream inputStream = null;
         try {
-            if (StringUtils.isEmpty(invoiceImg.getFileUrl())) {
+            if (StringUtils.isEmpty(invoiceFile.getFileUrl())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceImg.getMiddleFileId()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片地址为空（数据库主键编号：%s），请检查数据库该字段的【url】内容后再试。", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            if (StringUtils.isEmpty(invoiceImg.getInvoId())) {
+            if (StringUtils.isEmpty(invoiceFile.getInvoId())) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceImg.getMiddleFileId()));
+                jsonObject.put("msg", String.format("准备上传阶段-->该图片发票Id为空（数据库主键编号：%s），请检查数据库该字段的【invoId】内容后再试。", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            if (!(invoiceImg.getFileName().toLowerCase().endsWith(".jpg")||
-                    invoiceImg.getFileName().toLowerCase().endsWith(".png"))) {
+            if (!(invoiceFile.getFileName().equalsIgnoreCase("jpg")||
+                    invoiceFile.getFileName().equalsIgnoreCase("png"))) {
                 jsonObject.put("code", "0");
-                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceImg.getMiddleFileId()));
+                jsonObject.put("msg", String.format("准备上传阶段-->图片格式必须为jpg/png（数据库主键编号：%s）", invoiceFile.getMiddleFileId()));
                 return jsonObject;
             }
-            File file = new File(invoiceImg.getFileUrl());
-            byte[] fileBase64Byte=new byte[(int)file.length()];
-            fileInputStream=new FileInputStream(file);
-            fileInputStream.read(fileBase64Byte);
-            jsonObject.put("fileBase64Str", Base64.getEncoder().encodeToString(fileBase64Byte));
+            Request request = (new okhttp3.Request.Builder()).get().url(invoiceFile.getFileUrl()).build();
+            Call call = InterfaceConfigHelper.okHttpClient.newCall(request);
+            Response response = call.execute();
+
+            if (response.code() != HttpStatusEnum.OK.getKey()) {
+                jsonObject.put("code", "0");
+                jsonObject.put("msg", String.format("下载网络地址图片到本地阶段-->下载图片失败（数据库主键编号：%s），请求HTTP状态为：%s（%s）。", invoiceFile.getMiddleFileId(), HttpStatusEnum.getValueByKey(response.code()), response.code()));
+                return jsonObject;
+            }
+            inputStream = response.body().byteStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while((len = inputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            byte[] fileBase64Byte = outStream.toByteArray();
+            jsonObject.put("fileBase64Str",Base64.getEncoder().encodeToString(fileBase64Byte));
         } catch (Exception e) {
             e.printStackTrace();
+            jsonObject.put("code", "0");
+            jsonObject.put("msg", String.format("获取图片-->图片获取失败：", e.getMessage()));
+            return jsonObject;
         }finally {
-            if(fileInputStream!=null) {
+            if(inputStream!=null) {
                 try {
-                    fileInputStream.close();
+                    inputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", String.format("关闭输入流失败-->", e.getMessage()));
+                    return jsonObject;
+                }
+            }
+            if(outStream!=null) {
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", String.format("关闭输出流失败-->", e.getMessage()));
+                    return jsonObject;
                 }
             }
         }
