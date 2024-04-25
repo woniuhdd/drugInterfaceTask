@@ -11,6 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class MiddlePurchaseOrder {
 
+    @TableId(value = "ID", type = IdType.ID_WORKER_STR)
     private String 	id	;
     private String 	ordId	;//	订单 ID
     private String 	ordCode	;//	订单 CODE

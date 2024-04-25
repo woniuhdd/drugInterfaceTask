@@ -510,9 +510,11 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleOrderShpList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleOrderShpList(int page) {
+    public JSONObject getMiddleOrderShpList(String startTime, String endTime,int page) {
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
+        data.put("starTime",startTime);
+        data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_SHP, data);
         try {
             //1.解析结果
@@ -524,7 +526,7 @@ public class TestController {
                     if (middleOrderShpList.size() > 0){
                         middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
                         if(page<outputData.getInteger("totalPageCount")){
-                            getMiddleOrderShpList(++page);
+                            getMiddleOrderShpList(startTime,endTime,++page);
                         }
                     }
                 }else {
@@ -657,22 +659,17 @@ public class TestController {
     public JSONObject getMiddlePurchaseOrderListNew() throws IOException {
         String dataList ;
         StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Administrator\\Desktop\\111\\2.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Lenovo\\Desktop\\222\\10.txt"));
         while((dataList=reader.readLine())!=null){
             stringBuilder.append(dataList);
         }
         List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(stringBuilder.toString(), MiddlePurchaseOrder.class);
         if (middlePurchaseOrderList.size() > 0){
-            middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
+            middlePurchaseOrderService.saveBatch(middlePurchaseOrderList);
         }
         JSONObject returnJsonObj = new JSONObject();
         returnJsonObj.put("resultCode", "0");
-        returnJsonObj.put("resultMsg", "调用采购订单接口失败");
+        returnJsonObj.put("resultMsg", "调用采购订单接口成功");
         return returnJsonObj;
-
-
-
-
-
     }
 }
