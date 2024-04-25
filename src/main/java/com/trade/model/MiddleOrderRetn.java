@@ -139,4 +139,7 @@ public class MiddleOrderRetn implements Serializable {
     @TableField("SHP_ID")
     private String shpId;
 
+    @TableField("PACMATL")
+    private String pacmatl;
+
 }

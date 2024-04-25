@@ -42,8 +42,8 @@ public class MiddleOrderRetnJob implements BaseJob {
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
         cal.add(Calendar.DATE, -1);
-        data.put("strUpTime", DateUtil.dateFormat(cal.getTime()));
-        data.put("endUpTime", DateUtil.dateFormat(now));
+        data.put("strUpTime", DateUtil.dateTimeFormat(cal.getTime()));
+        data.put("endUpTime", DateUtil.dateTimeFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
 
         try {
