@@ -40,8 +40,8 @@ public class BaseCompanyInfo implements Serializable {
     private String orgName;
 
     //(value = "企业类型")
-    @TableField("ORG_TYPEID")
-    private String orgTypeid;
+    @TableField("ORG_TYPE_CODE")
+    private String orgTypeCode;
 
     //(value = "联系人")
     @TableField("CONER")
