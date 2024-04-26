@@ -35,6 +35,9 @@ public class BaseHospitalInfo implements Serializable {
     @TableField("ENTP_CODE")
     private String entpCode;
 
+    @TableField("ORG_TYPE_CODE")
+    private String orgTypeCode;
+
     //(value = "医疗机构名称")
     @TableField("ORG_NAME")
     private String orgName;
