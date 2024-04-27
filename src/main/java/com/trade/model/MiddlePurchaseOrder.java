@@ -11,12 +11,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class MiddlePurchaseOrder {
 
-    @TableId(value = "ID", type = IdType.ID_WORKER_STR)
+//    @TableId(value = "ID", type = IdType.ID_WORKER_STR)
     private String 	id	;
     private String 	ordId	;//	订单 ID
     private String 	ordCode	;//	订单 CODE
     private String 	ordDetlId	;//	订单明细 ID
-//    @TableId(value = "SHP_ID", type = IdType.ID_WORKER_STR)
+    @TableId(value = "SHP_ID", type = IdType.ID_WORKER_STR)
     private String 	shpId	;//	发货 ID
     private Double	pubonlnPric	;//	挂网价格
     private Double	purcpric	;//	采购价格
