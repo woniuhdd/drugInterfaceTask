@@ -23,14 +23,14 @@ public class MiddlePurchaseOrderJob implements BaseJob {
     @Override
     public void execute(JobExecutionContext context) {
         try {
-            syncDatas(1);
+            syncDatas("1");
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("获取采购订单信息任务执行的时间：" + DateUtil.dateTimeFormat(new Date()));
     }
 
-    public void  syncDatas( int page){
+    public void  syncDatas( String page){
         log.info("采购订单接口查询");
         JSONObject data=new JSONObject();
         Date now=new Date();
@@ -51,8 +51,9 @@ public class MiddlePurchaseOrderJob implements BaseJob {
                     List<MiddlePurchaseOrder> orderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (orderList.size() > 0){
                         orderService.saveOrUpdateBatch(orderList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            syncDatas(++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            syncDatas(String.valueOf(++pageTemp));
                         }
                     }
                 }else {

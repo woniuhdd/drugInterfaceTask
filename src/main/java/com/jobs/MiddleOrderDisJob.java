@@ -78,7 +78,7 @@ public class MiddleOrderDisJob implements BaseJob {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(middlePurchaseOrder.getSendTime());
                 cal.add(Calendar.DATE, 1);
-                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),1);
+                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),"1");
                 if(object.getString("resultCode").equals("0")){
                     orderDis.setResponseInfo(orderDis.getResponseInfo()+"  "+object.getString("resultMsg"));
                 }
@@ -93,7 +93,7 @@ public class MiddleOrderDisJob implements BaseJob {
     }
 
 
-    public JSONObject updateMiddlePurchaseOrderListByCode(String ordCode, String startTime, String endTime,int page){
+    public JSONObject updateMiddlePurchaseOrderListByCode(String ordCode, String startTime, String endTime,String page){
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("ordCode",ordCode);
@@ -108,14 +108,15 @@ public class MiddleOrderDisJob implements BaseJob {
                 if("1".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
-                        if (page == 1){
+                        int pageTemp = Integer.valueOf(page);
+                        if (pageTemp == 1){
                             middlePurchaseOrderService.removeByMap(new HashMap<String, Object>(){{
                                 put("ord_code",ordCode);
                             }});
                         }
                         middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            updateMiddlePurchaseOrderListByCode(ordCode,startTime,endTime,++page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            updateMiddlePurchaseOrderListByCode(ordCode,startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{

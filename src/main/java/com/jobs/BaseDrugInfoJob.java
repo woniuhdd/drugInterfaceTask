@@ -29,14 +29,14 @@ public class BaseDrugInfoJob implements BaseJob {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             log.info("获取商品信息任务开始的时间：" + dateFormat.format(new Date()));
-            syncDatas(1);
+            syncDatas("1");
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("获取商品信息任务执行的时间：" + dateFormat.format(new Date()));
     }
 
-    public void  syncDatas(int page){
+    public void  syncDatas(String page){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         JSONObject data = new JSONObject();
@@ -58,8 +58,9 @@ public class BaseDrugInfoJob implements BaseJob {
                     List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
                     if (druginfos.size() > 0){
                         baseDrugInfoService.saveOrUpdateBatch(druginfos);
-                        if (page < outputData.getInteger("totalPageCount")) {
-                            syncDatas(++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if (pageTemp < outputData.getInteger("totalPageCount")) {
+                            syncDatas(String.valueOf(++pageTemp));
                         }
                     }
                 }else {

@@ -56,7 +56,7 @@ public class TestController {
 
     @RequestMapping(value = "/getBaseCompanyInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseCompanyInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseCompanyInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -73,8 +73,9 @@ public class TestController {
                     List<BaseCompanyInfo> baseCompanyInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
                     if (baseCompanyInfoList.size() > 0){
                         baseCompanyInfoService.saveOrUpdateBatch(baseCompanyInfoList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseCompanyInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseCompanyInfoList(dataList,startTime,endTime, String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -106,7 +107,7 @@ public class TestController {
      */
     @RequestMapping(value = "/getBaseDrugInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseDrugInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseDrugInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -123,8 +124,9 @@ public class TestController {
                     List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
                     if (druginfos.size() > 0){
                         baseDrugInfoService.saveOrUpdateBatch(druginfos);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseDrugInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseDrugInfoList(dataList,startTime,endTime, String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -153,7 +155,7 @@ public class TestController {
 
     @RequestMapping(value = "/getBaseHospitalInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseHospitalInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseHospitalInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -170,8 +172,9 @@ public class TestController {
                     List<BaseHospitalInfo> baseHospitalInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                     if (baseHospitalInfoList.size() > 0){
                         baseHospitalInfoService.saveOrUpdateBatch(baseHospitalInfoList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseHospitalInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseHospitalInfoList(dataList,startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -201,7 +204,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddlePurchaseOrderList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddlePurchaseOrderList(String startTime, String endTime,int page) {
+    public JSONObject getMiddlePurchaseOrderList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("startTime",startTime);
@@ -216,8 +219,9 @@ public class TestController {
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
                         middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getMiddlePurchaseOrderList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getMiddlePurchaseOrderList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -247,7 +251,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleInvoiceInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleInvoiceInfoList(String startTime, String endTime,int page) {
+    public JSONObject getMiddleInvoiceInfoList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("startTime",startTime);
@@ -262,8 +266,9 @@ public class TestController {
                     List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
                     if (invoiceList.size() > 0){
                         invoiceService.saveOrUpdateBatch(invoiceList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getMiddleInvoiceInfoList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getMiddleInvoiceInfoList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -510,7 +515,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleOrderShpList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleOrderShpList(String startTime, String endTime,int page) {
+    public JSONObject getMiddleOrderShpList(String startTime, String endTime,String page) {
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
         data.put("starTime",startTime);
@@ -525,8 +530,9 @@ public class TestController {
                     List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
                     if (middleOrderShpList.size() > 0){
                         middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            getMiddleOrderShpList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            getMiddleOrderShpList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else {
@@ -552,7 +558,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleOrderRetnList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleOrderRetnList(String startTime, String endTime,int page) {
+    public JSONObject getMiddleOrderRetnList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("strUpTime",startTime);
@@ -566,8 +572,9 @@ public class TestController {
                     List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
                     if (middleOrderRetnList.size() > 0){
                         middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            getMiddleOrderRetnList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            getMiddleOrderRetnList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else {
@@ -648,7 +655,7 @@ public class TestController {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(middlePurchaseOrder.getSendTime());
                 cal.add(Calendar.DATE, 1);
-                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),1);
+                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),"1");
                 if(object.getString("resultCode").equals("0")){
                     orderDis.setResponseInfo(orderDis.getResponseInfo()+"  "+object.getString("resultMsg"));
                 }
@@ -665,7 +672,7 @@ public class TestController {
         return returnJsonObj;
     }
 
-    public JSONObject updateMiddlePurchaseOrderListByCode(String ordCode, String startTime, String endTime,int page){
+    public JSONObject updateMiddlePurchaseOrderListByCode(String ordCode, String startTime, String endTime,String page){
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("ordCode",ordCode);
@@ -680,14 +687,15 @@ public class TestController {
                 if("1".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
-                        if (page == 1){
+                        int pageTemp = Integer.valueOf(page);
+                        if (pageTemp == 1){
                             middlePurchaseOrderService.removeByMap(new HashMap<String, Object>(){{
                                 put("ord_code",ordCode);
                             }});
                         }
                         middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            updateMiddlePurchaseOrderListByCode(ordCode,startTime,endTime,++page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            updateMiddlePurchaseOrderListByCode(ordCode,startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
