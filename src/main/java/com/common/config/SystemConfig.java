@@ -55,23 +55,23 @@ public class SystemConfig {
     public static final String SEND_ORDER_DIS="C1008";
 
     /**
-     * 药品设置发票
-     */
-    public static final String SEND_INVOICE_SHP="C1009";
-
-    /**
      * 药品获取收货信息
      */
-    public static final String GET_ORDER_SHP="C1010";
+    public static final String GET_ORDER_SHP="C1009";
 
     /**
      * 药品获取退货订单
      */
-    public static final String GET_ORDER_RETN="C1011";
+    public static final String GET_ORDER_RETN="C1010";
 
     /**
      * 药品退货订单响应
      */
-    public static final String SEND_ORDER_RETN="C1012";
+    public static final String SEND_ORDER_RETN="C1011";
+
+    /**
+     * 药品设置发票
+     */
+    public static final String SEND_INVOICE_SHP="C1012";
 
 }

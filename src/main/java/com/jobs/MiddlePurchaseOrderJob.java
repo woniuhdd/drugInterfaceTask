@@ -39,8 +39,8 @@ public class MiddlePurchaseOrderJob implements BaseJob {
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
         cal.add(Calendar.DATE, -1);
-        data.put("startTime", "2024-01-01");
-        data.put("endTime", DateUtil.dateFormat(now));
+        data.put("startTime", DateUtil.dateFormat(cal.getTime()) + " 00:00:00");
+        data.put("endTime", DateUtil.dateFormat(now) + " 23:59:59");
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
         try {
             //1.解析结果

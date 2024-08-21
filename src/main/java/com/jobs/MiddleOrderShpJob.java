@@ -12,6 +12,7 @@ import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,12 @@ public class MiddleOrderShpJob implements BaseJob {
         log.info("获取收货信息接口查询");
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
+        Date now=new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.DATE, -1);
+        data.put("startTime", DateUtil.dateFormat(cal.getTime()) + " 00:00:00");
+        data.put("endTime", DateUtil.dateFormat(now) + " 23:59:59");
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_SHP, data);
         try {
             //1.解析结果

@@ -30,8 +30,8 @@ public class DemoController {
         Date now=new Date();
         data.put("currentPageNumber", 1);
         //订单发送日期
-        data.put("startTime", DateUtil.dateFormat(now));
-        data.put("endTime", DateUtil.dateFormat(now));
+        data.put("startTime", DateUtil.dateFormat(now) + " 00:00:00");
+        data.put("endTime", DateUtil.dateFormat(now) + " 23:59:59");
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
         //1.解析结果
         IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
