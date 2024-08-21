@@ -28,14 +28,14 @@ public class BaseHospitalInfoJob implements BaseJob {
     @Override
     public void execute(JobExecutionContext context) {
         try {
-            syncDatas(1);
+            syncDatas("1");
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("获取医疗机构信息任务执行的时间：" + dateFormat.format(new Date()));
     }
 
-    public void  syncDatas( int page){
+    public void  syncDatas( String page){
         log.info("医疗机构接口查询");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         JSONObject data = new JSONObject();
@@ -57,8 +57,9 @@ public class BaseHospitalInfoJob implements BaseJob {
                     List<BaseHospitalInfo> hospitalInfos = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                     if (hospitalInfos.size() > 0){
                         baseHospitalInfoService.saveOrUpdateBatch(hospitalInfos);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            syncDatas(++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            syncDatas(String.valueOf(++pageTemp));
                         }
                     }
                 }else {

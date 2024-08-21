@@ -42,6 +42,7 @@ mybatis-plus:
   mapper-locations: mappings/*/**.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    jdbc-type-for-null: 'null'
 mybatis:
   configuration:
     call-setters-on-nulls: true
@@ -54,6 +55,6 @@ logging:
 
 
 intf:
-  appCode: b9266895aace4121a4bf48bf71b72781 #接口调用凭证应用码
-  authCode: ae16914cc5b746d89ca707ee568e5209 #接口调用凭证授权码
-  url: http://60.31.22.187:9100 #接口请求地址
+  appCode: 560c102a79c1468cb5df3ee97758f2b5 #接口调用凭证应用码
+  authCode: a314a167000543ffbb4ef9e4c33fcc2d #接口调用凭证授权码
+  url: http://60.31.22.187:9000 #接口请求地址

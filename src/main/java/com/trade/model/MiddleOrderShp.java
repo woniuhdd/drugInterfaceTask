@@ -134,4 +134,82 @@ public class MiddleOrderShp implements Serializable {
     //(value = "有效期")
     @TableField("EXPY_ENDTIME")
     private Date expyEndtime;
+
+    @TableField("ITEM_CODG")
+    private String itemCodg;
+
+    @TableField("TWO_INFONO")
+    private String twoInfono;
+
+    @TableField("HOSP_LIST_ID")
+    private String hospListId;
+
+    @TableField("ESSDRUG_TYPE")
+    private String essdrugType;
+
+    @TableField("MINUNT_NAME")
+    private String minuntName;
+
+    @TableField("DELVENTP_CODE")
+    private String delventpCode;
+
+    @TableField("SHP_TIME")
+    private Date shpTime;
+
+    @TableField("SHPP_TIME")
+    private Date shppTime;
+
+    @TableField("MINPACUNT_NAME")
+    private String minpacuntName;
+
+    @TableField("ITEMNAME")
+    private String itemname;
+
+    @TableField("SHP_MEMO")
+    private String shpMemo;
+
+    @TableField("RTNB_CNT")
+    private Double rtnbCnt;
+
+    @TableField("PROD_TYPE")
+    private String prodType;
+
+    @TableField("SEL_LIST")
+    private String selList;
+
+    @TableField("CONVRAT")
+    private String convrat;
+
+    @TableField("RETN_CNT")
+    private Double retnCnt;
+
+    @TableField("PROD_ID")
+    private String prodId;
+
+    @TableField("APRVNO")
+    private String aprvno;
+
+    @TableField("DCLA_ENTP_CODE")
+    private String dclaEntpCode;
+
+    @TableField("SHP_CODE")
+    private String shpCode;
+
+    @TableField("SPLM_FLAG")
+    private String splmFlag;
+
+    @TableField("DELVENTP_NAME")
+    private String delventpName;
+
+    @TableField("PACMATL")
+    private String pacmatl;
+
+    @TableField("DCLA_ENTP_NAME")
+    private String dclaEntpName;
+
+    @TableField("HOSP_BIDPRCU_ITEM_ID")
+    private String hospBidprcuItemId;
+
+    @TableField("MEDINS_CODE")
+    private String medinsCode;
 }

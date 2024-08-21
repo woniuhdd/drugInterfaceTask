@@ -25,14 +25,14 @@ public class MiddleInvoiceJob implements BaseJob {
     @Override
     public void execute(JobExecutionContext context) {
         try {
-            syncDatas(1);
+            syncDatas("1");
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("获取发票信息任务执行的时间：" + DateUtil.dateTimeFormat(new Date()));
     }
 
-    public void  syncDatas(int page){
+    public void  syncDatas(String page){
         log.info("获取发票信息接口查询");
         JSONObject data=new JSONObject();
         Date now=new Date();
@@ -53,8 +53,9 @@ public class MiddleInvoiceJob implements BaseJob {
                     List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
                     if (invoiceList.size() > 0){
                         invoiceService.saveOrUpdateBatch(invoiceList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            syncDatas(++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            syncDatas(String.valueOf(++pageTemp));
                         }
                     }
                 }else {

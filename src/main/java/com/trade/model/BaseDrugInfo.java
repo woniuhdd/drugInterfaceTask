@@ -108,5 +108,23 @@ public class BaseDrugInfo implements Serializable {
 	@TableField("UPDT_TIME")
 	private Date updtTime;
 
+	@TableField("MINUNT_NAME")
+	private String minuntName;
+
+	@TableField("DCLA_ENTP_CODE")
+	private String dclaEntpCode;
+
+	@TableField("MINPACUNT_NAME")
+	private String minpacuntName;
+
+	@TableField("PRODENTP_CODE")
+	private String prodentpCode;
+
+	@TableField("PUBONLN_RSLT_ID")
+	private String pubonlnRsltId;
+
+	@TableField("TENDITM_ID")
+	private String tenditmId;
+
 }
 

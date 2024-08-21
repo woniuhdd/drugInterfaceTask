@@ -56,7 +56,7 @@ public class TestController {
 
     @RequestMapping(value = "/getBaseCompanyInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseCompanyInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseCompanyInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -73,8 +73,9 @@ public class TestController {
                     List<BaseCompanyInfo> baseCompanyInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
                     if (baseCompanyInfoList.size() > 0){
                         baseCompanyInfoService.saveOrUpdateBatch(baseCompanyInfoList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseCompanyInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseCompanyInfoList(dataList,startTime,endTime, String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -106,7 +107,7 @@ public class TestController {
      */
     @RequestMapping(value = "/getBaseDrugInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseDrugInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseDrugInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -123,8 +124,9 @@ public class TestController {
                     List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
                     if (druginfos.size() > 0){
                         baseDrugInfoService.saveOrUpdateBatch(druginfos);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseDrugInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseDrugInfoList(dataList,startTime,endTime, String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -153,7 +155,7 @@ public class TestController {
 
     @RequestMapping(value = "/getBaseHospitalInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getBaseHospitalInfoList(String dataList,String startTime, String endTime,int page) {
+    public JSONObject getBaseHospitalInfoList(String dataList,String startTime, String endTime,String page) {
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
@@ -170,8 +172,9 @@ public class TestController {
                     List<BaseHospitalInfo> baseHospitalInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                     if (baseHospitalInfoList.size() > 0){
                         baseHospitalInfoService.saveOrUpdateBatch(baseHospitalInfoList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getBaseHospitalInfoList(dataList,startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getBaseHospitalInfoList(dataList,startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -201,7 +204,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddlePurchaseOrderList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddlePurchaseOrderList(String startTime, String endTime,int page) {
+    public JSONObject getMiddlePurchaseOrderList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("startTime",startTime);
@@ -216,8 +219,9 @@ public class TestController {
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
                         middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getMiddlePurchaseOrderList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getMiddlePurchaseOrderList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -240,14 +244,14 @@ public class TestController {
         }
         JSONObject returnJsonObj = new JSONObject();
         returnJsonObj.put("resultCode", "0");
-        returnJsonObj.put("resultMsg", "调用采购订单接口失败");
+        returnJsonObj.put("resultMsg", "调用采购订单接口成功");
         return returnJsonObj;
     }
 
 
     @RequestMapping(value = "/getMiddleInvoiceInfoList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleInvoiceInfoList(String startTime, String endTime,int page) {
+    public JSONObject getMiddleInvoiceInfoList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("startTime",startTime);
@@ -262,8 +266,9 @@ public class TestController {
                     List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
                     if (invoiceList.size() > 0){
                         invoiceService.saveOrUpdateBatch(invoiceList);
-                        if(page < outputData.getInteger("totalPageCount")){
-                            getMiddleInvoiceInfoList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            getMiddleInvoiceInfoList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else{
@@ -510,9 +515,11 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleOrderShpList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleOrderShpList(int page) {
+    public JSONObject getMiddleOrderShpList(String startTime, String endTime,String page) {
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
+        data.put("starTime",startTime);
+        data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_SHP, data);
         try {
             //1.解析结果
@@ -523,8 +530,9 @@ public class TestController {
                     List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
                     if (middleOrderShpList.size() > 0){
                         middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            getMiddleOrderShpList(++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            getMiddleOrderShpList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else {
@@ -550,7 +558,7 @@ public class TestController {
 
     @RequestMapping(value = "/getMiddleOrderRetnList", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getMiddleOrderRetnList(String startTime, String endTime,int page) {
+    public JSONObject getMiddleOrderRetnList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("strUpTime",startTime);
@@ -564,8 +572,9 @@ public class TestController {
                     List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
                     if (middleOrderRetnList.size() > 0){
                         middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
-                        if(page<outputData.getInteger("totalPageCount")){
-                            getMiddleOrderRetnList(startTime,endTime,++page);
+                        int pageTemp = Integer.valueOf(page);
+                        if(pageTemp<outputData.getInteger("totalPageCount")){
+                            getMiddleOrderRetnList(startTime,endTime,String.valueOf(++pageTemp));
                         }
                     }
                 }else {
@@ -609,7 +618,7 @@ public class TestController {
             map.put("shpId",orderDis.getShpId());
             map.put("shpCnt",orderDis.getShpCnt());
             map.put("manuLotnum",orderDis.getManuLotnum());
-            map.put("expyEndtime",orderDis.getExpyEndtime());
+            map.put("expyEndtime",DateUtil.dateFormat(orderDis.getExpyEndtime()));
             map.put("shpMemo",orderDis.getShpMemo());
             dataList.add(map);
             data.put("dataList",dataList);
@@ -620,14 +629,14 @@ public class TestController {
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
-                    if("0".equals(outputData.getString("returnCode"))){
+                    if("1".equals(outputData.getString("returnCode"))){
                         orderDis.setResponseState("2");
                         returnJsonObj.put("resultCode", "1");
                         returnJsonObj.put("resultMsg", "上传发货信息成功，shpId："+orderDis.getShpId());
                     }else{
                         orderDis.setResponseState("3");
                         returnJsonObj.put("resultCode", "0");
-                        returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId());
+                        returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId()+","+body.getErr_msg());
                     }
                     orderDis.setResponseInfo(outputData.getString("returnMsg"));
 
@@ -639,7 +648,19 @@ public class TestController {
                     returnJsonObj.put("resultMsg", "上传发货信息失败，shpId："+orderDis.getShpId()+","+body.getErr_msg());
                 }
                 orderDis.setResponseTime(new Date());
+
+
+                //根据采购单号更新采购信息
+                MiddlePurchaseOrder middlePurchaseOrder = middlePurchaseOrderService.getById(orderDis.getShpId());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(middlePurchaseOrder.getSendTime());
+                cal.add(Calendar.DATE, 1);
+                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),"1");
+                if(object.getString("resultCode").equals("0")){
+                    orderDis.setResponseInfo(orderDis.getResponseInfo()+"  "+object.getString("resultMsg"));
+                }
                 orderDisService.updateById(orderDis);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 log.info("药品发货信息上传接口异常");
@@ -651,28 +672,54 @@ public class TestController {
         return returnJsonObj;
     }
 
-
-    @RequestMapping(value = "/getMiddlePurchaseOrderListNew", method = {RequestMethod.POST})
-    @ResponseBody
-    public JSONObject getMiddlePurchaseOrderListNew() throws IOException {
-        String dataList ;
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Administrator\\Desktop\\111\\2.txt"));
-        while((dataList=reader.readLine())!=null){
-            stringBuilder.append(dataList);
-        }
-        List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(stringBuilder.toString(), MiddlePurchaseOrder.class);
-        if (middlePurchaseOrderList.size() > 0){
-            middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
+    public JSONObject updateMiddlePurchaseOrderListByCode(String ordCode, String startTime, String endTime,String page){
+        JSONObject data = new JSONObject();
+        data.put("currentPageNumber",page);
+        data.put("ordCode",ordCode);
+        data.put("startTime",startTime);
+        data.put("endTime",endTime);
+        String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER, data);
+        try {
+            IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
+            //1.解析结果
+            if(body.getInfcode()==0){
+                JSONObject outputData = body.getOutput().getJSONObject("data");
+                if("1".equals(outputData.getString("returnCode"))){
+                    List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
+                    if (middlePurchaseOrderList.size() > 0){
+                        int pageTemp = Integer.valueOf(page);
+                        if (pageTemp == 1){
+                            middlePurchaseOrderService.removeByMap(new HashMap<String, Object>(){{
+                                put("ord_code",ordCode);
+                            }});
+                        }
+                        middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
+                        if(pageTemp < outputData.getInteger("totalPageCount")){
+                            updateMiddlePurchaseOrderListByCode(ordCode,startTime,endTime,String.valueOf(++pageTemp));
+                        }
+                    }
+                }else{
+                    log.info("根据采购单号更新采购信息失败======"+body.getErr_msg());
+                }
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "1");
+                returnJsonObj.put("resultMsg", "共获取"+outputData.getInteger("totalRecordCount"));
+                return returnJsonObj;
+            }else {
+                log.info("根据采购单号更新采购信息失败======"+body.getErr_msg());
+                JSONObject returnJsonObj = new JSONObject();
+                returnJsonObj.put("resultCode", "0");
+                returnJsonObj.put("resultMsg", body.getErr_msg());
+                return returnJsonObj;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("根据采购单号更新采购信息失败");
         }
         JSONObject returnJsonObj = new JSONObject();
         returnJsonObj.put("resultCode", "0");
-        returnJsonObj.put("resultMsg", "调用采购订单接口失败");
+        returnJsonObj.put("resultMsg", "根据采购单号更新采购信息成功");
         return returnJsonObj;
-
-
-
-
-
     }
+
 }

@@ -18,7 +18,7 @@ import java.util.Date;
  * @since 2023-08-23
  */
 @Data
-@TableName("MIDDLE_ORDER_RETN")
+@TableName("MIDDLE_RETN_ORDER")
 public class MiddleOrderRetn implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -138,5 +138,8 @@ public class MiddleOrderRetn implements Serializable {
     //(value = "发货id")
     @TableField("SHP_ID")
     private String shpId;
+
+    @TableField("PACMATL")
+    private String pacmatl;
 
 }
