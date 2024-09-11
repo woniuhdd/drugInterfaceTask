@@ -36,7 +36,7 @@ public class BaseCompanyInfoJob implements BaseJob {
 
     public void  syncDatas( String page){
         log.info("企业接口查询");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject data = new JSONObject();
         data.put("currentPageNumber", page);
         Date date = new Date();
@@ -52,7 +52,7 @@ public class BaseCompanyInfoJob implements BaseJob {
             IntfResponseBody body =requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<BaseCompanyInfo> companys = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
                     if (companys.size() > 0){
                         baseCompanyInfoService.saveOrUpdateBatch(companys);

@@ -50,7 +50,7 @@ public class MiddleInvoiceShpJob implements BaseJob {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==200){
                     invoiceShp.setResponseState("2");
                     invoiceShp.setResponseInfo(outputData.getString("returnMsg"));
                 }else {

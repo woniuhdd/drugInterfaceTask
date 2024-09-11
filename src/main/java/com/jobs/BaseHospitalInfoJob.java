@@ -37,15 +37,15 @@ public class BaseHospitalInfoJob implements BaseJob {
 
     public void  syncDatas( String page){
         log.info("医疗机构接口查询");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject data = new JSONObject();
         data.put("currentPageNumber", page);
         Date date = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DAY_OF_MONTH, -15);
-        data.put("strUpTime",sdf.format(cal.getTime()));
-        data.put("endUpTime",sdf.format(date));
+        data.put("startTime",sdf.format(cal.getTime()));
+        data.put("endTime",sdf.format(date));
 
         String requestBody = requestService.getRequestBody(SystemConfig.GET_HOSPITAL, data);
         try {
@@ -53,7 +53,7 @@ public class BaseHospitalInfoJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<BaseHospitalInfo> hospitalInfos = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                     if (hospitalInfos.size() > 0){
                         baseHospitalInfoService.saveOrUpdateBatch(hospitalInfos);

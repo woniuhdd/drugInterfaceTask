@@ -69,7 +69,7 @@ public class TestController {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<BaseCompanyInfo> baseCompanyInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseCompanyInfo.class);
                     if (baseCompanyInfoList.size() > 0){
                         baseCompanyInfoService.saveOrUpdateBatch(baseCompanyInfoList);
@@ -120,7 +120,7 @@ public class TestController {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
                     if (druginfos.size() > 0){
                         baseDrugInfoService.saveOrUpdateBatch(druginfos);
@@ -160,15 +160,15 @@ public class TestController {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
         data.put("dataList",dataList);
-        data.put("strUpTime",startTime);
-        data.put("endUpTime",endTime);
+        data.put("startTime",startTime);
+        data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_HOSPITAL, data);
         try {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<BaseHospitalInfo> baseHospitalInfoList = JSONArray.parseArray(outputData.getString("dataList"), BaseHospitalInfo.class);
                     if (baseHospitalInfoList.size() > 0){
                         baseHospitalInfoService.saveOrUpdateBatch(baseHospitalInfoList);
@@ -215,7 +215,7 @@ public class TestController {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
                         middlePurchaseOrderService.saveOrUpdateBatch(middlePurchaseOrderList);
@@ -262,7 +262,7 @@ public class TestController {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
                     if (invoiceList.size() > 0){
                         invoiceService.saveOrUpdateBatch(invoiceList);
@@ -320,7 +320,7 @@ public class TestController {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==200){
                     invoiceInfo.setRetnInvoId(outputData.getString("invoId"));
                     invoiceInfo.setResponseState("2");
                     invoiceInfo.setResponseInfo(outputData.getString("returnMsg"));
@@ -374,7 +374,7 @@ public class TestController {
                 //1.解析结果
                 IntfResponseBody body =requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestParam);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==200){
                     invoiceImg.setFileId(outputData.getString("fileId"));
                     invoiceImg.setResponseState("2");
                     invoiceImg.setResponseInfo(outputData.getString("returnMsg"));
@@ -487,7 +487,7 @@ public class TestController {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==200){
                     invoiceShp.setResponseState("2");
                     invoiceShp.setResponseInfo(outputData.getString("returnMsg"));
                     returnJsonObj.put("resultCode", "1");
@@ -526,7 +526,7 @@ public class TestController {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
                     if (middleOrderShpList.size() > 0){
                         middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);
@@ -561,14 +561,14 @@ public class TestController {
     public JSONObject getMiddleOrderRetnList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
-        data.put("strUpTime",startTime);
-        data.put("endUpTime",endTime);
+        data.put("starTime",startTime);
+        data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
         try {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
                     if (middleOrderRetnList.size() > 0){
                         middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);
@@ -629,7 +629,7 @@ public class TestController {
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
-                    if("1".equals(outputData.getString("returnCode"))){
+                    if("200".equals(outputData.getString("returnCode"))){
                         orderDis.setResponseState("2");
                         returnJsonObj.put("resultCode", "1");
                         returnJsonObj.put("resultMsg", "上传发货信息成功，shpId："+orderDis.getShpId());
@@ -684,7 +684,7 @@ public class TestController {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
                         int pageTemp = Integer.valueOf(page);

@@ -48,7 +48,7 @@ public class MiddleOrderShpJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleOrderShp> middleOrderShpList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderShp.class);
                     if (middleOrderShpList.size() > 0){
                         middleOrderShpService.saveOrUpdateBatch(middleOrderShpList);

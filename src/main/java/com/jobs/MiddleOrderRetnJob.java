@@ -42,8 +42,8 @@ public class MiddleOrderRetnJob implements BaseJob {
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
         cal.add(Calendar.DATE, -1);
-        data.put("strUpTime", DateUtil.dateTimeFormat(cal.getTime()));
-        data.put("endUpTime", DateUtil.dateTimeFormat(now));
+        data.put("starTime", DateUtil.dateTimeFormat(cal.getTime()));
+        data.put("endTime", DateUtil.dateTimeFormat(now));
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
 
         try {
@@ -51,7 +51,7 @@ public class MiddleOrderRetnJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleOrderRetn> middleOrderRetnList = JSONArray.parseArray(outputData.getString("dataList"), MiddleOrderRetn.class);
                     if (middleOrderRetnList.size() > 0){
                         middleOrderRetnService.saveOrUpdateBatch(middleOrderRetnList);

@@ -37,7 +37,7 @@ public class BaseDrugInfoJob implements BaseJob {
     }
 
     public void  syncDatas(String page){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         JSONObject data = new JSONObject();
         data.put("currentPageNumber", page);
@@ -54,7 +54,7 @@ public class BaseDrugInfoJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL, requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if ("1".equals(outputData.getString("returnCode"))) {
+                if ("200".equals(outputData.getString("returnCode"))) {
                     List<BaseDrugInfo> druginfos = JSONArray.parseArray(outputData.getString("dataList"), BaseDrugInfo.class);
                     if (druginfos.size() > 0){
                         baseDrugInfoService.saveOrUpdateBatch(druginfos);

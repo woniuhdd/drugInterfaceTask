@@ -54,7 +54,7 @@ public class MiddleInvoiceResponseJob implements BaseJob {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==1){
+                if(body.getInfcode()==0&&outputData.getInteger("returnCode")==200){
                     invoiceInfo.setRetnInvoId(outputData.getString("invoId"));
                     invoiceInfo.setResponseState("2");
                     invoiceInfo.setResponseInfo(outputData.getString("returnMsg"));

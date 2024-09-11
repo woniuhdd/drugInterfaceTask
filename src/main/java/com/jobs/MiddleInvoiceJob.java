@@ -41,15 +41,15 @@ public class MiddleInvoiceJob implements BaseJob {
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        data.put("startTime", DateUtil.dateFormat(cal.getTime()));
-        data.put("endTime", DateUtil.dateFormat(now));
+        data.put("startTime", DateUtil.dateFormat(cal.getTime()) + " 00:00:00");
+        data.put("endTime", DateUtil.dateFormat(now) + " 23:59:59");
         String requestBody = requestService.getRequestBody(SystemConfig.GET_INVOICE_INFO, data);
         try {
             //1.解析结果
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddleInvoice> invoiceList = JSONArray.parseArray(outputData.getString("dataList"), MiddleInvoice.class);
                     if (invoiceList.size() > 0){
                         invoiceService.saveOrUpdateBatch(invoiceList);

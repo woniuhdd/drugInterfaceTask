@@ -51,7 +51,7 @@ public class MiddleOrderRetnResponseJob implements BaseJob {
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
-                    if("0".equals(outputData.getString("returnCode"))){
+                    if("200".equals(outputData.getString("returnCode"))){
                         middleOrderRetnResponse.setResponseState("2");
                     }else{
                         middleOrderRetnResponse.setResponseState("3");

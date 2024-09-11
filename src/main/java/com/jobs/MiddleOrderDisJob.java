@@ -59,7 +59,7 @@ public class MiddleOrderDisJob implements BaseJob {
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
-                    if("1".equals(outputData.getString("returnCode"))){
+                    if("200".equals(outputData.getString("returnCode"))){
                         orderDis.setResponseState("2");
                     }else{
                         orderDis.setResponseState("3");

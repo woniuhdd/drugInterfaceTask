@@ -47,7 +47,7 @@ public class MiddlePurchaseOrderJob implements BaseJob {
             IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> orderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (orderList.size() > 0){
                         orderService.saveOrUpdateBatch(orderList);
