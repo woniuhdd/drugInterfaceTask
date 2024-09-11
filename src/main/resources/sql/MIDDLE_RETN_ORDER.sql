@@ -2,56 +2,56 @@
 Navicat Oracle Data Transfer
 Oracle Client Version : 11.2.0.1.0
 
-Source Server         : 127nmyp
+Source Server         : local
 Source Server Version : 110200
-Source Host           : 127.0.0.1:1521
+Source Host           : 192.168.8.248:1521
 Source Schema         : NMYP
 
 Target Server Type    : ORACLE
 Target Server Version : 110200
 File Encoding         : 65001
 
-Date: 2024-04-25 16:24:10
+Date: 2024-09-11 16:46:40
 */
 
 
 -- ----------------------------
 -- Table structure for MIDDLE_RETN_ORDER
 -- ----------------------------
--- DROP TABLE "NMYP"."MIDDLE_RETN_ORDER";
+DROP TABLE "NMYP"."MIDDLE_RETN_ORDER";
 CREATE TABLE "NMYP"."MIDDLE_RETN_ORDER" (
-                                            "ORD_CODE" VARCHAR2(40 BYTE) NULL ,
-                                            "RETN_ID" VARCHAR2(100 BYTE) NOT NULL ,
-                                            "PROD_NAME" VARCHAR2(255 BYTE) NULL ,
-                                            "DRUG_CODE" VARCHAR2(255 BYTE) NULL ,
-                                            "DOSFORM" VARCHAR2(255 BYTE) NULL ,
-                                            "PROD_SPEC" VARCHAR2(255 BYTE) NULL ,
-                                            "PROD_MATL" VARCHAR2(255 BYTE) NULL ,
-                                            "PROD_PAC" VARCHAR2(255 BYTE) NULL ,
-                                            "PAC_MATL" VARCHAR2(255 BYTE) NULL ,
-                                            "PRODENTP_NAME" VARCHAR2(255 BYTE) NULL ,
-                                            "PURCPRIC" NUMBER(18,2) NULL ,
-                                            "MEDINS_NAME" VARCHAR2(255 BYTE) NULL ,
-                                            "MEDINS_CODE" VARCHAR2(255 BYTE) NULL ,
-                                            "RETN_CNT" NUMBER(18,2) NULL ,
-                                            "PUBONLN_PRIC" NUMBER(18,2) NULL ,
-                                            "MEDINS_RETN_REA" VARCHAR2(255 BYTE) NULL ,
-                                            "MEDINS_RETN_TIME" DATE NULL ,
-                                            "RETURN_INVOICE_ID" VARCHAR2(255 BYTE) NULL ,
-                                            "ORD_DETL_ID" VARCHAR2(255 BYTE) NULL ,
-                                            "MANU_LOTNUM" VARCHAR2(255 BYTE) NULL ,
-                                            "RETN_CHK_STAS" VARCHAR2(255 BYTE) NULL ,
-                                            "DELVENTP_PASS_TIME" DATE NULL ,
-                                            "DELVENTP_FAIL_REA" VARCHAR2(255 BYTE) NULL ,
-                                            "DELVENTP_FAIL_TIME" DATE NULL ,
-                                            "RETN_AMT" NUMBER(18,2) NULL ,
-                                            "DELVENTP_NAME" VARCHAR2(255 BYTE) NULL ,
-                                            "APRVNO" VARCHAR2(255 BYTE) NULL ,
-                                            "DCLA_ENTP_NAME" VARCHAR2(255 BYTE) NULL ,
-                                            "SHP_ID" VARCHAR2(255 BYTE) NULL ,
-                                            "PACMATL" VARCHAR2(255 BYTE) NULL
+"ORD_CODE" VARCHAR2(40 BYTE) NULL ,
+"RETN_ID" VARCHAR2(100 BYTE) NOT NULL ,
+"PROD_NAME" VARCHAR2(255 BYTE) NULL ,
+"DRUG_CODE" VARCHAR2(255 BYTE) NULL ,
+"DOSFORM" VARCHAR2(255 BYTE) NULL ,
+"PROD_SPEC" VARCHAR2(255 BYTE) NULL ,
+"PROD_MATL" VARCHAR2(255 BYTE) NULL ,
+"PROD_PAC" VARCHAR2(255 BYTE) NULL ,
+"PAC_MATL" VARCHAR2(255 BYTE) NULL ,
+"PRODENTP_NAME" VARCHAR2(255 BYTE) NULL ,
+"PURCPRIC" NUMBER(18,2) NULL ,
+"MEDINS_NAME" VARCHAR2(255 BYTE) NULL ,
+"MEDINS_CODE" VARCHAR2(255 BYTE) NULL ,
+"RETN_CNT" NUMBER(18,2) NULL ,
+"PUBONLN_PRIC" NUMBER(18,2) NULL ,
+"MEDINS_RETN_REA" VARCHAR2(255 BYTE) NULL ,
+"MEDINS_RETN_TIME" DATE NULL ,
+"RETURN_INVOICE_ID" VARCHAR2(255 BYTE) NULL ,
+"ORD_DETL_ID" VARCHAR2(255 BYTE) NULL ,
+"MANU_LOTNUM" VARCHAR2(255 BYTE) NULL ,
+"RETN_CHK_STAS" VARCHAR2(255 BYTE) NULL ,
+"DELVENTP_PASS_TIME" DATE NULL ,
+"DELVENTP_FAIL_REA" VARCHAR2(255 BYTE) NULL ,
+"DELVENTP_FAIL_TIME" DATE NULL ,
+"RETN_AMT" NUMBER(18,2) NULL ,
+"DELVENTP_NAME" VARCHAR2(255 BYTE) NULL ,
+"APRVNO" VARCHAR2(255 BYTE) NULL ,
+"DCLA_ENTP_NAME" VARCHAR2(255 BYTE) NULL ,
+"SHP_ID" VARCHAR2(255 BYTE) NULL ,
+"PACMATL" VARCHAR2(255 BYTE) NULL 
 )
-    LOGGING
+LOGGING
 NOCOMPRESS
 NOCACHE
 
@@ -94,6 +94,8 @@ COMMENT ON COLUMN "NMYP"."MIDDLE_RETN_ORDER"."SHP_ID" IS '发货id';
 -- ----------------------------
 -- Checks structure for table MIDDLE_RETN_ORDER
 -- ----------------------------
+ALTER TABLE "NMYP"."MIDDLE_RETN_ORDER" ADD CHECK ("RETN_ID" IS NOT NULL);
+ALTER TABLE "NMYP"."MIDDLE_RETN_ORDER" ADD CHECK ("RETN_ID" IS NOT NULL);
 ALTER TABLE "NMYP"."MIDDLE_RETN_ORDER" ADD CHECK ("RETN_ID" IS NOT NULL);
 
 -- ----------------------------

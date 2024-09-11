@@ -518,7 +518,7 @@ public class TestController {
     public JSONObject getMiddleOrderShpList(String startTime, String endTime,String page) {
         JSONObject data=new JSONObject();
         data.put("currentPageNumber", String.valueOf(page));
-        data.put("starTime",startTime);
+        data.put("startTime",startTime);
         data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_SHP, data);
         try {
@@ -561,7 +561,7 @@ public class TestController {
     public JSONObject getMiddleOrderRetnList(String startTime, String endTime,String page) {
         JSONObject data = new JSONObject();
         data.put("currentPageNumber",page);
-        data.put("starTime",startTime);
+        data.put("startTime",startTime);
         data.put("endTime",endTime);
         String requestBody = requestService.getRequestBody(SystemConfig.GET_ORDER_RETN, data);
         try {
