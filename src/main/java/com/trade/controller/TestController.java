@@ -618,7 +618,7 @@ public class TestController {
             map.put("shpId",orderDis.getShpId());
             map.put("shpCnt",orderDis.getShpCnt());
             map.put("manuLotnum",orderDis.getManuLotnum());
-            map.put("expyEndtime",DateUtil.dateFormat(orderDis.getExpyEndtime()));
+            map.put("expyEndtime",DateUtil.dateTimeFormat(orderDis.getExpyEndtime()));
             map.put("shpMemo",orderDis.getShpMemo());
             dataList.add(map);
             data.put("dataList",dataList);
@@ -655,7 +655,7 @@ public class TestController {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(middlePurchaseOrder.getSendTime());
                 cal.add(Calendar.DATE, 1);
-                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),"1");
+                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateTimeFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateTimeFormat(cal.getTime()),"1");
                 if(object.getString("resultCode").equals("0")){
                     orderDis.setResponseInfo(orderDis.getResponseInfo()+"  "+object.getString("resultMsg"));
                 }

@@ -48,7 +48,7 @@ public class MiddleOrderDisJob implements BaseJob {
             map.put("shpId",orderDis.getShpId());
             map.put("shpCnt",orderDis.getShpCnt());
             map.put("manuLotnum",orderDis.getManuLotnum());
-            map.put("expyEndtime",DateUtil.dateFormat(orderDis.getExpyEndtime()));
+            map.put("expyEndtime",DateUtil.dateTimeFormat(orderDis.getExpyEndtime()));
             map.put("shpMemo",orderDis.getShpMemo());
             dataList.add(map);
             data.put("dataList",dataList);
@@ -57,6 +57,7 @@ public class MiddleOrderDisJob implements BaseJob {
             try {
                 //1.解析结果
                 IntfResponseBody body = requestService.getDataByUrl(SystemConfig.COMMON_INTERFACES_URL,requestBody);
+                log.info("药品发货信息上传接口返回数据======"+body);
                 if(body.getInfcode()==0){
                     JSONObject outputData = body.getOutput().getJSONObject("data");
                     if("200".equals(outputData.getString("returnCode"))){
@@ -78,7 +79,7 @@ public class MiddleOrderDisJob implements BaseJob {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(middlePurchaseOrder.getSendTime());
                 cal.add(Calendar.DATE, 1);
-                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateFormat(cal.getTime()),"1");
+                JSONObject object = updateMiddlePurchaseOrderListByCode(middlePurchaseOrder.getOrdCode(),DateUtil.dateTimeFormat(middlePurchaseOrder.getSendTime()),DateUtil.dateTimeFormat(cal.getTime()),"1");
                 if(object.getString("resultCode").equals("0")){
                     orderDis.setResponseInfo(orderDis.getResponseInfo()+"  "+object.getString("resultMsg"));
                 }
@@ -105,7 +106,7 @@ public class MiddleOrderDisJob implements BaseJob {
             //1.解析结果
             if(body.getInfcode()==0){
                 JSONObject outputData = body.getOutput().getJSONObject("data");
-                if("1".equals(outputData.getString("returnCode"))){
+                if("200".equals(outputData.getString("returnCode"))){
                     List<MiddlePurchaseOrder> middlePurchaseOrderList = JSONArray.parseArray(outputData.getString("dataList"), MiddlePurchaseOrder.class);
                     if (middlePurchaseOrderList.size() > 0){
                         int pageTemp = Integer.valueOf(page);
